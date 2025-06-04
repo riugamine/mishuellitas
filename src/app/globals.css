@@ -1,26 +1,207 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@plugin 'tailwindcss-animate';
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@custom-variant dark (&:is(.dark *));
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* 
+  The default border color has changed to `currentColor` in Tailwind CSS v4, 
+  so we've added these compatibility styles to make sure everything still 
+  looks the same as it did with Tailwind CSS v3. 
+
+  If we ever want to remove these styles, we need to add an explicit border 
+  color utility to any element that depends on these defaults. 
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer utilities {
+  body {
+    /* Fuentes personalizadas */
+    font-family: var(--font-montserrat);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-poppins);
+  }
+}
+
+@layer base {
+  :root {
+      /* Base colors - Mis Huellitas palette */
+      --background: 45 77% 98%; /* #FFFCF7 - Nuevo color de fondo */
+      --foreground: 210 65% 11%; /* #0F1A26 - Color de texto oscuro para el fondo claro */
+  
+      --card: 45 77% 98%; /* #FFFCF7 */
+      --card-foreground: 210 65% 11%; /* #0F1A26 */
+  
+      --popover: 45 77% 98%; /* #FFFCF7 */
+      --popover-foreground: 210 65% 11%; /* #0F1A26 */
+  
+      /* Primary color - Dark Blue */
+      --primary: 210 65% 11%; /* #0F1A26 - Color principal */
+      --primary-foreground: 34 91% 60%; /* #F2A73B - Color naranja para contraste */
+  
+      /* Secondary color - Medium Blue */
+      --secondary: 206 35% 39%; /* #355572 - Color secundario */
+      --secondary-foreground: 34 91% 60%; /* #F2A73B - Color naranja para contraste */
+  
+      /* Accent color - Lighter variation for interactive elements */
+      --accent: 206 35% 50%;
+      --accent-foreground: 34 91% 60%; /* #F2A73B */
+  
+      /* Highlight color - For special elements */
+      --highlight: 34 91% 60%; /* #F2A73B - Color naranja */
+      --highlight-foreground: 210 65% 11%;
+  
+      /* Muted - For subtle backgrounds */
+      --muted: 210 65% 95%;
+      --muted-foreground: 210 65% 40%;
+  
+      /* System colors */
+      --destructive: 0 84% 60%;
+      --destructive-foreground: 45 77% 98%;
+  
+      --border: 210 65% 85%;
+      --input: 210 65% 90%;
+      --ring: 206 35% 39%;
+  
+      --radius: 0.5rem;
+    }
+  }
+
+  .dark {
+    /* Modo oscuro */
+    --background: 212 100% 10%; /* #001730 */
+    --foreground: 0 0% 100%;
+
+    --card: 212 100% 10%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 212 100% 10%;
+    --popover-foreground: 0 0% 100%;
+
+    /* Color primario en modo oscuro */
+    --primary: 219 35% 64%; /* #7F98C9 */
+    --primary-foreground: 212 100% 10%;
+
+    /* Color secundario en modo oscuro */
+    --secondary: 255 72% 30%; /* #32217A */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Color de acento en modo oscuro */
+    --accent: 39 100% 93%; /* #FFF4DB */
+    --accent-foreground: 212 100% 10%;
+
+    /* Color muted en modo oscuro */
+    --muted: 212 100% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Colores de estado y feedback */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 212 27% 20%;
+    --input: 212 27% 20%;
+    --ring: 219 35% 64%;
+  }
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* 
+  ---break--- 
+*/
+
+@theme inline {
+  --animate-grid: grid 15s linear infinite;
+  @keyframes grid {
+  0% {
+    transform: translateY(-50%);
+    }
+  100% {
+    transform: translateY(0);
+    }
+  }
+}
+
+/* 
+  ---break--- 
+*/
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
