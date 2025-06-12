@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, Montserrat } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+
 import "./globals.css";
 
 const poppins = Poppins({
@@ -132,8 +134,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${poppins.variable} ${montserrat.variable} font-montserrat antialiased`}>
-        {children}
+      <body className={`${poppins.variable} ${montserrat.variable} font-montserrat antialiased`} suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

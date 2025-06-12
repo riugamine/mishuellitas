@@ -1,6 +1,7 @@
 'use client'
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faPaw } from '@fortawesome/free-solid-svg-icons';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
@@ -41,13 +42,15 @@ export function HeroSection() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                <Button 
-                  className="bg-white text-primary hover:bg-white/90 transition-all duration-300 text-lg font-semibold px-10 py-7 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 hover:scale-105"
-                  size="lg"
-                >
-                  <FontAwesomeIcon icon={faPaw} className="h-6 w-6 mr-3" />
-                  VER PRODUCTOS
-                </Button>
+                <Link href="/productos">
+                  <Button 
+                    className="bg-white text-primary hover:bg-white/90 transition-all duration-300 text-lg font-semibold px-10 py-7 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 hover:scale-105"
+                    size="lg"
+                  >
+                    <FontAwesomeIcon icon={faPaw} className="h-6 w-6 mr-3" />
+                    VER PRODUCTOS
+                  </Button>
+                </Link>
                 
                 <Button 
                   variant="outline" 
