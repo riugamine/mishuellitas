@@ -1,98 +1,115 @@
+'use client'
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faPaw } from '@fortawesome/free-solid-svg-icons';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { CurvedDivider } from '@/components/ui/curved-divider';
 
 export function HeroSection() {
+  const handleWhatsAppClick = () => {
+    const phoneNumber = "+584248805609";
+    const message = encodeURIComponent("¡Hola! ¿Cómo pueden ayudarme?");
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
-    <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 px-4 sm:px-6 md:px-10 py-12 md:py-24 bg-background relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-10 text-6xl">🐕</div>
-        <div className="absolute top-32 right-20 text-4xl">🐾</div>
-        <div className="absolute bottom-40 left-20 text-5xl">🐈</div>
-        <div className="absolute bottom-20 right-10 text-3xl">❤️</div>
+    <section className="w-full min-h-screen flex flex-col justify-center bg-gradient-to-br from-primary via-secondary to-accent relative overflow-hidden">
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-10 py-12 md:py-24">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[80vh]">
+            {/* Left Content */}
+            <div className="space-y-8 z-10 animate-slide-in-left">
+              <div className="space-y-6">
+                <h1 className="font-poppins font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-tight">
+                  Cuidando{" "}
+                  <br className="hidden sm:block" />
+                  a tu{" "}
+                  <span className="relative inline-block">
+                    <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                      Mascota
+                    </span>
+                  </span>
+                  <span className="text-white text-6xl md:text-7xl lg:text-8xl">!</span>
+                </h1>
+                
+                <p className="font-montserrat text-xl text-white/80 max-w-lg leading-relaxed">
+                  La conexión humano-canina es la relación especial entre 
+                  los perros y los humanos, construida con amor y cuidado.
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                <Button 
+                  className="bg-white text-primary hover:bg-white/90 transition-all duration-300 text-lg font-semibold px-10 py-7 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 hover:scale-105"
+                  size="lg"
+                >
+                  <FontAwesomeIcon icon={faPaw} className="h-6 w-6 mr-3" />
+                  VER PRODUCTOS
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={handleWhatsAppClick}
+                  className="border-2 border-white text-white hover:bg-white hover:text-primary transition-all duration-300 text-lg font-semibold px-10 py-7 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 hover:scale-105"
+                  size="lg"
+                >
+                  <FontAwesomeIcon icon={faWhatsapp} className="h-6 w-6 mr-3" />
+                  CONTACTAR
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Image */}
+            <div className="relative z-10 h-full min-h-[600px] lg:min-h-[80vh] animate-slide-in-right">
+              <div className="relative w-full h-full max-w-2xl mx-auto">
+                {/* Main dog image */}
+                <div className="relative w-full h-full">
+                  <Image 
+                    src="https://res.cloudinary.com/dhzl31kb8/image/upload/v1749400765/pexels-dagmara-dombrovska-22732579-19047434_tgs2u9_e_background_removal_f_png_rcmpdo.png" 
+                    alt="Perro inteligente con lentes - Accesorios premium Mis Huellitas" 
+                    fill
+                    priority
+                    className="object-contain"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </div>
+                
+                {/* Floating decorative elements */}
+                <div className="absolute top-10 -left-6 bg-white/20 backdrop-blur-sm text-white px-6 py-4 rounded-full text-lg font-bold shadow-xl animate-fade-in-up"
+                  style={{ animationDelay: '0.8s' }}
+                >
+                  <FontAwesomeIcon icon={faHeart} className="h-5 w-5 mr-2" />
+                  Con amor
+                </div>
+                
+                <div className="absolute top-1/2 -right-8 bg-white/20 backdrop-blur-sm text-white px-6 py-4 rounded-full text-lg font-bold shadow-xl animate-fade-in-up"
+                  style={{ animationDelay: '1.2s' }}
+                >
+                  <FontAwesomeIcon icon={faPaw} className="h-5 w-5 mr-2" />
+                  Premium
+                </div>
+                
+                <div className="absolute bottom-20 -left-8 bg-white/20 backdrop-blur-sm text-white px-6 py-4 rounded-full text-lg font-bold shadow-xl animate-fade-in-up"
+                  style={{ animationDelay: '1.6s' }}
+                >
+                  ✨ Calidad
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <div className="flex-1 space-y-6 sm:space-y-8 max-w-2xl z-10">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <FontAwesomeIcon icon={faPaw} className="h-6 w-6 text-secondary" />
-            <span className="font-montserrat text-secondary font-medium text-lg">
-              Mis Huellitas
-            </span>
-          </div>
-          
-          <h1 className="font-poppins font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground leading-tight">
-            Todo lo que tu{" "}
-            <span className="text-primary-foreground relative">
-              peludo
-              <FontAwesomeIcon 
-                icon={faHeart} 
-                className="h-6 w-6 text-secondary/60 absolute -top-2 -right-8 animate-pulse" 
-              />
-            </span>{" "}
-            necesita, en un solo lugar
-          </h1>
-          
-          <p className="font-montserrat text-lg sm:text-xl text-foreground/70 max-w-2xl leading-relaxed">
-            Descubre nuestra increíble colección de <strong className="text-foreground">ropa</strong>, <strong className="text-foreground">accesorios</strong> y <strong className="text-foreground">juguetes </strong> 
-            para consentir a tu mascota con estilo, comodidad y mucha diversión.
-          </p>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row gap-4 pt-4">
-          <Button 
-            className="bg-secondary hover:bg-secondary/90 text-primary-foreground transition-all duration-300 text-base font-semibold px-8 py-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            size="lg"
-          >
-            <FontAwesomeIcon icon={faPaw} className="h-5 w-5 mr-2" />
-            Explorar Productos
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="border-2 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground transition-all duration-300 text-base font-semibold px-8 py-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1"
-            size="lg"
-          >
-            <FontAwesomeIcon icon={faWhatsapp} className="h-5 w-5 mr-2" />
-            Chatea con nosotros
-          </Button>
-        </div>
-        
-        <div className="flex items-center gap-6 pt-4 text-foreground/60">
-          <div className="flex items-center gap-2">
-            <span className="font-montserrat text-sm">✨ Productos de calidad</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-montserrat text-sm">🚚 Envío rápido</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-montserrat text-sm">💝 Amor garantizado</span>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex-1 relative w-full max-w-xl aspect-square md:h-[600px] z-10">
-        <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gradient-to-br from-secondary/10 to-accent/10 p-8">
-          <Image 
-            src="/hero-image.png" 
-            alt="Perrito feliz con productos de Mis Huellitas - accesorios para mascotas" 
-            fill
-            priority
-            className="object-contain"
-          />
-          
-          {/* Floating badges */}
-          <div className="absolute top-4 right-4 bg-secondary text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-            ¡Nuevo!
-          </div>
-          <div className="absolute bottom-4 left-4 bg-highlight text-primary px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-            Pronto disponible
-          </div>
-        </div>
-      </div>
+            {/* Curved divider from hero */}
+            <CurvedDivider 
+        variant="organic" 
+        direction="up" 
+        color="hsl(var(--background))" 
+        height={80}
+        className="-mt-1"
+      />
+
     </section>
   );
 }
