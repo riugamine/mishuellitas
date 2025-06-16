@@ -27,7 +27,7 @@ export function AboutSection() {
             </h2>
             
             <p className="font-montserrat text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed">
-              Somos una familia de amantes de las mascotas que entiende perfectamente el amor incondicional que sientes por tu peludo
+            Somos amantes de los animales que creen que cada peludo merece sentirse amado, cómodo y especial. Más que una tienda, somos un rincón hecho con cariño para quienes entienden que una mascota es familia.
             </p>
           </div>
           
