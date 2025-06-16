@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faStar, faPaw } from '@fortawesome/free-solid-svg-icons';
-import { CurvedDivider } from '@/components/ui/curved-divider';
 
 export function AboutSection() {
   return (
