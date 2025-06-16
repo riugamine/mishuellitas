@@ -6,10 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "pages:build": "next build && next export",
-    "pages:deploy": "wrangler pages deploy dist",
-    "pages:dev": "wrangler pages dev dist"
+    "lint": "next lint"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -39,7 +36,6 @@
     "eslint-config-next": "15.3.2",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.0",
-    "typescript": "^5",
-    "wrangler": "^4.20.0"
+    "typescript": "^5"
   }
 }

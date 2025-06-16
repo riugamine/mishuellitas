@@ -14,9 +14,7 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     formats: ['image/webp'],
   },
-  output: 'export', // Cambiado de 'standalone' a 'export' para mejor compatibilidad
-  distDir: 'dist', // Directorio de salida personalizado
-  poweredByHeader: false, // Mejor seguridad
+  poweredByHeader: false,
   reactStrictMode: true,
 };
 
