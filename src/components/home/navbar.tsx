@@ -37,9 +37,9 @@ export function Navbar() {
             <Image 
               src={theme === 'dark' ? "https://res.cloudinary.com/dhzl31kb8/image/upload/v1749400159/08-A_ln9qo8.png" : "https://res.cloudinary.com/dhzl31kb8/image/upload/v1749072088/01-A_jidteo.png"} 
               alt="Mis Huellitas" 
-              width={150} 
-              height={150} 
-              sizes="150px"
+              width={150}
+              height={150}
+              priority={true}
               className="drop-shadow-sm"
             />
           </div>

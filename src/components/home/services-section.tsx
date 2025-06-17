@@ -23,7 +23,7 @@ export function ServicesSection() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             {/* Delivery Service */}
             <div 
-              className="bg-white/95 dark:bg-primary backdrop-blur-sm p-8 shadow-xl border border-white/20 dark:border-primary/20 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-slide-in-left"
+              className="bg-primary dark:bg-accent backdrop-blur-sm p-8 shadow-xl border border-white/20 dark:border-primary/20 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-slide-in-left"
               style={{ 
                 borderRadius: '2rem 0.8rem 2rem 0.8rem',
                 animationDelay: '0.2s'
@@ -31,29 +31,29 @@ export function ServicesSection() {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="bg-secondary/20 p-4 rounded-full">
-                  <FontAwesomeIcon icon={faTruck} className="h-8 w-8 text-secondary dark:text-white" />
+                  <FontAwesomeIcon icon={faTruck} className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="font-poppins font-bold text-2xl text-foreground dark:text-white">Delivery</h3>
+                <h3 className="font-poppins font-bold text-2xl text-white">Delivery</h3>
               </div>
               
               <div className="space-y-4">
-                <p className="font-montserrat text-foreground/70 mb-6">
+                <p className="font-montserrat text-white/70 mb-6">
                   Entrega rápida y confiable para tu comodidad
                 </p>
                 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2">
-                    <span className="font-montserrat font-semibold text-foreground dark:text-white">Pago</span>
-                    <span className="font-montserrat text-foreground/70">12:00 PM - 10:00 PM</span>
+                    <span className="font-montserrat font-semibold text-white">Pago</span>
+                    <span className="font-montserrat text-white/70">12:00 PM - 10:00 PM</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
-                    <span className="font-montserrat font-semibold text-foreground dark:text-white">Envios nacionales</span>
-                    <span className="font-montserrat text-foreground/70">ZOOM , MRW</span>
+                    <span className="font-montserrat font-semibold text-white">Envios nacionales</span>
+                    <span className="font-montserrat text-white/70">ZOOM , MRW</span>
                   </div>
                 </div>
                 
                 <div className="mt-4 p-4 bg-secondary/10 rounded-2xl">
-                  <p className="font-montserrat text-sm text-foreground/60">
+                  <p className="font-montserrat text-sm text-white/60">
                     ✅ Disponible todos los días (lunes a lunes)
                   </p>
                 </div>
@@ -62,7 +62,7 @@ export function ServicesSection() {
             
             {/* Customer Service */}
             <div 
-              className="bg-white/95 dark:bg-primary p-8 shadow-xl border border-white/20 dark:border-primary/20 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-slide-in-right"
+              className="bg-primary dark:bg-accent p-8 shadow-xl border border-white/20 dark:border-primary/20 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 animate-slide-in-right"
               style={{ 
                 borderRadius: '0.8rem 2rem 0.8rem 2rem',
                 animationDelay: '0.4s'
@@ -70,25 +70,25 @@ export function ServicesSection() {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="bg-secondary/20 p-4 rounded-full">
-                  <FontAwesomeIcon icon={faHeadset} className="h-8 w-8 text-secondary dark:text-white" />
+                  <FontAwesomeIcon icon={faHeadset} className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="font-poppins font-bold text-2xl text-foreground">Atención al Cliente</h3>
+                <h3 className="font-poppins font-bold text-2xl text-white">Atención al Cliente</h3>
               </div>
               
               <div className="space-y-4">
-                <p className="font-montserrat text-foreground/70 mb-6">
+                <p className="font-montserrat text-white/70 mb-6">
                   Soporte personalizado las 24/7
                 </p>
                 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2">
-                    <span className="font-montserrat font-semibold text-foreground">Por WhatsApp</span>
-                    <span className="font-montserrat text-foreground/70">10:00 AM - 8:00 PM</span>
+                    <span className="font-montserrat font-semibold text-white">Por WhatsApp</span>
+                    <span className="font-montserrat text-white/70">10:00 AM - 8:00 PM</span>
                   </div>
                 </div>
                 
                 <div className="mt-4 p-4 bg-secondary/10 rounded-2xl">
-                  <p className="font-montserrat text-sm text-foreground/60">
+                  <p className="font-montserrat text-sm text-white/60">
                     💬 Respuesta rápida y personalizada
                   </p>
                 </div>

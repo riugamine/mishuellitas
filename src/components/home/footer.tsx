@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export function Footer() {
   return (
-    <footer className="w-full py-16 bg-gradient-to-br from-secondary via-primary to-accent text-primary-foreground px-6 md:px-10 relative overflow-hidden">
+    <footer className="w-full py-16 bg-primary dark:bg-accent text-white px-6 md:px-10 relative overflow-hidden">
       {/* Curved background shapes */}
       <div className="absolute top-0 left-0 w-80 h-80 bg-white/5 animate-morph opacity-30"></div>
       <div className="absolute bottom-0 right-0 w-60 h-60 bg-white/10 animate-blob opacity-40" style={{ animationDelay: '3s' }}></div>
@@ -28,7 +28,7 @@ export function Footer() {
                   alt="Mis Huellitas" 
                   width={150} 
                   height={150} 
-                  sizes="150px" 
+                  priority={true}
                   className="relative z-10 drop-shadow-lg"
                 />
               </div>
