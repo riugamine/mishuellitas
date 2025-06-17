@@ -37,7 +37,7 @@ export function Footer() {
             <div className="text-center md:text-left">
               
               <p className="font-montserrat text-sm text-white/80 max-w-xs">
-                Productos premium para el bienestar y felicidad de tu mascota
+                Accesorios y ropa con estilo propio para mascotas únicas como la tuya
               </p>
             </div>
           </div>
@@ -71,9 +71,6 @@ export function Footer() {
           <div className="flex flex-col items-center md:items-end gap-4 animate-slide-in-right" style={{ animationDelay: '0.4s' }}>
             <div className="text-center md:text-right">
               <h4 className="font-poppins font-semibold text-white mb-2">Síguenos</h4>
-              <p className="font-montserrat text-sm text-white/80">
-                @mishuellitasmgta
-              </p>
             </div>
             
             <div className="flex items-center gap-4">
@@ -94,7 +91,7 @@ export function Footer() {
         {/* Bottom section */}
         <div className="mt-12 pt-8 border-t border-white/20 text-center animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
           <p className="font-montserrat text-sm text-white/70">
-            © 2024 Mis Huellitas. Todos los derechos reservados. Hecho con amor para tu mascota.
+            © 2025 Mis Huellitas. Todos los derechos reservados. Hecho con amor para tu mascota.
           </p>
         </div>
       </div>
