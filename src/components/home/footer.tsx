@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faPaw } from '@fortawesome/free-solid-svg-icons';
-import { faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { faInstagram, faTiktok } from '@fortawesome/free-brands-svg-icons';
 import Link from "next/link";
 import Image from "next/image";
 
@@ -84,6 +84,18 @@ export function Footer() {
                   <FontAwesomeIcon icon={faInstagram} className="h-6 w-6 text-white" />
                 </Link>
               </div>
+              <div className="transform transition-all duration-200 hover:scale-125 hover:rotate-12">
+                <Link 
+                  href="https://www.tiktok.com/@mishuellitasmgta" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-white/10 backdrop-blur-sm p-3 rounded-full hover:bg-white/20 transition-all duration-300 block"
+                >
+                  <FontAwesomeIcon icon={faTiktok} className="h-6 w-6 text-white" />
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
             </div>
           </div>
         </div>

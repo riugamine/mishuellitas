@@ -92,13 +92,20 @@ export function AboutSection() {
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div 
-                  className="text-center p-8 bg-white/90 backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
+                  className="text-center p-8 bg-white/90 dark:bg-accent backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
                   style={{ 
                     borderRadius: '2rem 0.5rem 2rem 0.5rem',
                     animationDelay: '0.2s'
                   }}
                 >
-                  <div className="text-4xl mb-4">🐕</div>
+                  <div className="relative w-16 h-16 mx-auto mb-4">
+                    <Image 
+                      src="/icons/perro.png"
+                      alt="Perro icon"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
                   <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Para Perros</h4>
                   <p className="font-montserrat text-sm text-foreground/70">
                     Ropa, collares y juguetes
@@ -106,13 +113,20 @@ export function AboutSection() {
                 </div>
                 
                 <div 
-                  className="text-center p-8 bg-secondary/20 backdrop-blur-sm shadow-lg border border-secondary/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
+                  className="text-center p-8 bg-white/90 dark:bg-accent backdrop-blur-sm shadow-lg border border-secondary/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
                   style={{ 
                     borderRadius: '0.5rem 2rem 0.5rem 2rem',
                     animationDelay: '0.4s'
                   }}
                 >
-                  <div className="text-4xl mb-4">🐱</div>
+                  <div className="relative w-16 h-16 mx-auto mb-4">
+                    <Image 
+                      src="/icons/gato.png"
+                      alt="Gato icon"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
                   <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Para Gatos</h4>
                   <p className="font-montserrat text-sm text-foreground/70">
                     Accesorios y diversión
@@ -120,13 +134,20 @@ export function AboutSection() {
                 </div>
                 
                 <div 
-                  className="text-center p-8 bg-white/90 backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
+                  className="text-center p-8 bg-white/90 dark:bg-accent backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
                   style={{ 
                     borderRadius: '2rem 0.5rem 2rem 0.5rem',
                     animationDelay: '0.6s'
                   }}
                 >
-                  <div className="text-4xl mb-4">❤️</div>
+                  <div className="relative w-16 h-16 mx-auto mb-4">
+                    <Image 
+                      src="/icons/corazon.png"
+                      alt="Corazón icon"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
                   <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Con Amor</h4>
                   <p className="font-montserrat text-sm text-foreground/70">
                     Productos seleccionados especialmente
