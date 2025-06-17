@@ -1,33 +1,12 @@
+main = ".open-next/worker.js"
 name = "mishuellitas"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-03-25"
 compatibility_flags = ["nodejs_compat"]
 
-[site]
-bucket = ".next"
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
 
 [build]
 command = "npm run build"
-upload.format = "directory"
 
-[env.production]
-name = "mishuellitas-prod"
-route = "mishuellitas.com/*"
-
-[env.preview]
-name = "mishuellitas-preview"
-route = "preview.mishuellitas.com/*"
-
-# Configuración de caché optimizada
-[cache]
-browser_ttl = 3600
-edge_ttl = 86400
-serve_stale = true
-
-# Configuración de seguridad
-[security]
-headers = [
-  { name = "X-Frame-Options", value = "DENY" },
-  { name = "X-Content-Type-Options", value = "nosniff" },
-  { name = "Referrer-Policy", value = "strict-origin-when-cross-origin" },
-  { name = "Permissions-Policy", value = "camera=(), microphone=(), geolocation=()" }
-] 

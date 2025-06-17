@@ -14,9 +14,6 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     formats: ['image/webp'],
   },
-  distDir: '.next', // Changed to default Next.js output directory
-  poweredByHeader: false, // Mejor seguridad
-  reactStrictMode: true,
 };
 
 export default nextConfig;
