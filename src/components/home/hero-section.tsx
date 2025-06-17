@@ -104,10 +104,10 @@ export function HeroSection() {
       </div>
         {/* Curved divider from hero */}
         <CurvedDivider 
-        variant="organic" 
-        direction="up" 
+        variant="animated-wave" 
+        direction="down" 
         color="hsl(var(--background))" 
-        height={80}
+        height={100}
         className="-mt-30 z-10"
       />
 
