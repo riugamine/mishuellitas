@@ -97,7 +97,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
@@ -133,7 +133,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${poppins.variable} ${montserrat.variable} font-montserrat antialiased`} suppressHydrationWarning>
+      <body className={`${poppins.variable} ${montserrat.variable} font-montserrat antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>

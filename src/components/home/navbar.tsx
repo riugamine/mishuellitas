@@ -8,15 +8,13 @@ import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
-import { useTheme } from "next-themes";
 
 export function Navbar() {
-  const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleWhatsAppClick = () => {
     const phoneNumber = "+584248805609";
-    const message = encodeURIComponent("¡Hola! Me gustaría obtener más información sobre sus servicios.");
+    const message = encodeURIComponent("¡Hola! Bienvenido a Mis Huellitas Margarita, estamos encantados de tenerte aquí. ¿Cómo podemos ayudarte?");
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -35,12 +33,20 @@ export function Navbar() {
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all duration-300 transform hover:scale-105">
           <div className="transform transition-transform duration-200 hover:rotate-2">
             <Image 
-              src={theme === 'dark' ? "https://res.cloudinary.com/dhzl31kb8/image/upload/v1749400159/08-A_ln9qo8.png" : "https://res.cloudinary.com/dhzl31kb8/image/upload/v1749072088/01-A_jidteo.png"} 
+              src="https://res.cloudinary.com/dhzl31kb8/image/upload/v1750344275/01-A_jidteo_c_crop_w_5003_h_3729_yeywui.png" 
               alt="Mis Huellitas" 
-              width={150}
-              height={150}
+              width={100}
+              height={100}
               priority={true}
-              className="drop-shadow-sm"
+              className="drop-shadow-sm dark:hidden"
+            />
+            <Image 
+              src="https://res.cloudinary.com/dhzl31kb8/image/upload/v1750344009/01-A_qnmiib.png" 
+              alt="Mis Huellitas" 
+              width={100}
+              height={100}
+              priority={true}
+              className="drop-shadow-sm hidden dark:block"
             />
           </div>
         </Link>

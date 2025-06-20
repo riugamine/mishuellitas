@@ -35,13 +35,13 @@ export function CurvedDivider({
     
     organic: direction === 'down'
       ? `M0,0 C300,${height * 1.3} 500,${height * 0.3} 800,${height * 0.7} C1100,${height * 1.1} 1300,${height * 0.2} 1600,${height * 0.5} L1600,0 Z`
-      : `M0,${height} C300,${height * -0.3} 500,${height * 0.7} 800,${height * 0.3} C1100,${height * -0.1} 1300,${height * 0.8} 1600,${height * 0.5} L1600,${height} L0,${height} Z`,
+      : `M0,${height} C300,${height * -0.3} 500,${height * 0.7} 800,${height * 0.3} C1100,${height * -0.2} 1300,${height * 0.01} 1600,${height * 0.3} L1600,${height} L0,${height} Z`,
 
     'animated-wave': cyclicWavePath
   };
 
   return (
-    <div className={`relative w-full overflow-hidden ${className}`} style={{ height: `${height}px`, lineHeight: 0, padding: 0, margin: 0 }}>
+    <div className={`relative w-full overflow-hidden ${className}`} style={{ height: `${height}px`, lineHeight: 0, padding: 0}}>
       <svg
         className="absolute inset-0 w-full h-full block"
         viewBox={`0 0 1600 ${height}`}
