@@ -100,8 +100,7 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/favicon.ico" type="image/svg+xml" />
         <meta name="theme-color" content="#355572" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -128,7 +127,7 @@ export default function RootLayout({
               },
               "openingHours": "Mo-Su 10:00-20:00",
               "priceRange": "$",
-              "telephone": "+58-XXX-XXX-XXXX"
+              "telephone": "+58-412-555-5555"
             })
           }}
         />

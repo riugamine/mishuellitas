@@ -11,12 +11,20 @@ export function ProductsSection() {
   return (
     <>
       <section id="productos" className="w-full py-32 px-4 sm:px-6 md:px-10 bg-background relative overflow-hidden">
-        {/* Curved background shapes */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-accent/20 to-secondary/10 rounded-full blur-3xl opacity-60 animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-primary/20 to-accent/10 rounded-full blur-3xl opacity-50 animate-pulse" style={{ animationDelay: '3s' }}></div>
-        
         {/* Organic decorative elements */}
+        <div className="absolute top-10 right-5 w-64 h-64 bg-secondary/10 opacity-40 animate-float"
+          style={{ 
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            animationDelay: '2s'
+          }}
+        ></div>
         <div className="absolute top-20 left-10 w-32 h-32 bg-secondary/10 opacity-40 animate-float"
+          style={{ 
+            borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            animationDelay: '2s'
+          }}
+        ></div>
+        <div className="absolute bottom-10 left-5 w-64 h-64 bg-secondary/10 opacity-40 animate-float"
           style={{ 
             borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
             animationDelay: '2s'

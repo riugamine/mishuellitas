@@ -133,6 +133,12 @@ export function ServicesSection() {
                 textColor="text-white"
                 delay="1.6s"
               />
+              <PaymentMethod 
+                name="Paypal" 
+                bgColor="bg-white/20" 
+                textColor="text-white"
+                delay="1.8s"
+              />
             </div>
           </div>
         </div>

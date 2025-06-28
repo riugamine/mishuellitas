@@ -158,6 +158,12 @@ function DecorativeElements() {
       className:
         "absolute top-[18%] left-[40%] sm:top-[15%] sm:left-1/2 text-white/30 animate-float transform -rotate-45",
     },
+    {
+      icon: faPaw,
+      size: "2xl",
+      className:
+        "absolute top-[40%] left-[40%] sm:top-[45%] sm:left-1/2 text-white/30 animate-float transform -rotate-45",
+    },
     // Top-right decorative elements
     {
       icon: faBone,
