@@ -106,9 +106,9 @@ export function AboutSection() {
                       className="object-contain"
                     />
                   </div>
-                  <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Para Perros</h4>
+                  <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Para tu peludo</h4>
                   <p className="font-montserrat text-sm text-foreground/70">
-                    Ropa, collares y juguetes
+                  Ropa y accesorios 
                   </p>
                 </div>
                 
@@ -127,9 +127,9 @@ export function AboutSection() {
                       className="object-contain"
                     />
                   </div>
-                  <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Para Gatos</h4>
+                  <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Variedad que encanta</h4>
                   <p className="font-montserrat text-sm text-foreground/70">
-                    Accesorios y diversión
+                  Práctico, lindo y seguro
                   </p>
                 </div>
                 
@@ -150,7 +150,7 @@ export function AboutSection() {
                   </div>
                   <h4 className="font-poppins font-semibold text-foreground mb-3 text-lg">Con Amor</h4>
                   <p className="font-montserrat text-sm text-foreground/70">
-                    Productos seleccionados especialmente
+                    Productos seleccionados pensando en el estilo de tu mascota
                   </p>
                 </div>
               </div>
