@@ -92,7 +92,7 @@ export function AboutSection() {
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div 
-                  className="text-center p-8 bg-white/90 dark:bg-accent backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
+                  className="text-center p-8 bg-white/90 dark:bg-secondary backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
                   style={{ 
                     borderRadius: '2rem 0.5rem 2rem 0.5rem',
                     animationDelay: '0.2s'
@@ -113,7 +113,7 @@ export function AboutSection() {
                 </div>
                 
                 <div 
-                  className="text-center p-8 bg-white/90 dark:bg-accent backdrop-blur-sm shadow-lg border border-secondary/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
+                  className="text-center p-8 bg-white/90 dark:bg-secondary backdrop-blur-sm shadow-lg border border-secondary/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
                   style={{ 
                     borderRadius: '0.5rem 2rem 0.5rem 2rem',
                     animationDelay: '0.4s'
@@ -134,7 +134,7 @@ export function AboutSection() {
                 </div>
                 
                 <div 
-                  className="text-center p-8 bg-white/90 dark:bg-accent backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
+                  className="text-center p-8 bg-white/90 dark:bg-secondary backdrop-blur-sm shadow-lg border border-secondary/10 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up"
                   style={{ 
                     borderRadius: '2rem 0.5rem 2rem 0.5rem',
                     animationDelay: '0.6s'

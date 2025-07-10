@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { ProductCard } from '@/components/product/product-card';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 // Types for the component
 interface ProductDetailPageProps {
@@ -212,23 +213,26 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           </Card>
           {/* Miniaturas de imágenes */}
           {imagenes.length > 1 && (
-            <div className="flex gap-2 justify-center">
-              {imagenes.slice(0, 6).map((imagen, index) => (
-                <button
-                  key={imagen.id}
-                  type="button"
-                  className={`border rounded overflow-hidden w-16 h-16 p-0.5 transition-all ${primaryImage === imagen.image_url ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-primary'}`}
-                  onClick={() => setSelectedMainImage(imagen.image_url)}
-                  tabIndex={0}
-                >
-                  <img
-                    src={imagen.image_url}
-                    alt={`${product.nombre} miniatura ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+            <ScrollArea className="w-full max-w-xs md:max-w-sm lg:max-w-md overflow-x-auto">
+              <div className="flex gap-2 justify-center min-w-fit py-1">
+                {imagenes.map((imagen, index) => (
+                  <button
+                    key={imagen.id}
+                    type="button"
+                    className={`border rounded overflow-hidden w-16 h-16 p-0.5 transition-all ${primaryImage === imagen.image_url ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-primary'}`}
+                    onClick={() => setSelectedMainImage(imagen.image_url)}
+                    tabIndex={0}
+                  >
+                    <img
+                      src={imagen.image_url}
+                      alt={`${product.nombre} miniatura ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           )}
         </div>
         
@@ -242,10 +246,11 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           )}
           
           {/* Product Title */}
-          <h1 className="text-3xl font-bold text-gray-900">{product.nombre}</h1>
-          
-          {/* Product Description debajo del título */}
-          <p className="text-gray-600 leading-relaxed mb-2">{product.descripcion}</p>
+          <h1 className="text-3xl font-bold text-primary dark:text-primary-foreground">{product.nombre}</h1>
+          {/* Product Description debajo del título (máx 100 caracteres) */}
+          <p className="text-secondary dark:text-secondary-foreground leading-relaxed mb-2">
+            {product.descripcion.length > 100 ? product.descripcion.slice(0, 100) + '…' : product.descripcion}
+          </p>
           
           {/* Price */}
           <div className="flex items-baseline gap-2">
@@ -351,35 +356,35 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       <div className="mt-12">
         <Tabs defaultValue="detalles" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="detalles">Detalles</TabsTrigger>
-            <TabsTrigger value="especificaciones">Especificaciones</TabsTrigger>
+            <TabsTrigger value="detalles" className="text-primary dark:text-primary-foreground">Detalles</TabsTrigger>
+            <TabsTrigger value="especificaciones" className="text-primary dark:text-primary-foreground">Especificaciones</TabsTrigger>
           </TabsList>
           
           <TabsContent value="detalles" className="mt-6">
             <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Detalles del Producto</h3>
+              <h3 className="text-xl font-semibold mb-4 text-primary dark:text-primary-foreground">Detalles del Producto</h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <span className="font-medium">Categoría:</span>
-                    <p className="text-gray-600">{categoria?.nombre}</p>
+                    <span className="font-medium text-primary dark:text-primary-foreground">Categoría:</span>
+                    <p className="text-secondary dark:text-secondary-foreground">{categoria?.nombre}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Precio:</span>
-                    <p className="text-gray-600">REF {product.precio.toFixed(2)}</p>
+                    <span className="font-medium text-primary dark:text-primary-foreground">Precio:</span>
+                    <p className="text-secondary dark:text-secondary-foreground">REF {product.precio.toFixed(2)}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Stock:</span>
-                    <p className="text-gray-600">{currentStock} unidades</p>
+                    <span className="font-medium text-primary dark:text-primary-foreground">Stock:</span>
+                    <p className="text-secondary dark:text-secondary-foreground">{currentStock} unidades</p>
                   </div>
                   <div>
-                    <span className="font-medium">Estado:</span>
-                    <p className="text-gray-600">{product.is_active ? 'Activo' : 'Inactivo'}</p>
+                    <span className="font-medium text-primary dark:text-primary-foreground">Estado:</span>
+                    <p className="text-secondary dark:text-secondary-foreground">{product.is_active ? 'Activo' : 'Inactivo'}</p>
                   </div>
                 </div>
                 <div>
-                  <span className="font-medium">Descripción completa:</span>
-                  <p className="text-gray-600 mt-2">{product.descripcion}</p>
+                  <span className="font-medium text-primary dark:text-primary-foreground">Descripción completa:</span>
+                  <p className="text-secondary dark:text-secondary-foreground mt-2">{product.descripcion}</p>
                 </div>
               </div>
             </Card>
@@ -387,24 +392,24 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           
           <TabsContent value="especificaciones" className="mt-6">
             <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Especificaciones</h3>
+              <h3 className="text-xl font-semibold mb-4 text-primary dark:text-primary-foreground">Especificaciones</h3>
               <div className="space-y-4">
                 {hasVariants && (
                   <div>
-                    <span className="font-medium">Variantes disponibles:</span>
+                    <span className="font-medium text-primary dark:text-primary-foreground">Variantes disponibles:</span>
                     <div className="mt-2 space-y-2">
                       {variantes.map((variante) => (
-                        <div key={variante.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                          <span>{variante.talla}</span>
-                          <span className="text-sm text-gray-600">Stock: {variante.stock}</span>
+                        <div key={variante.id} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                          <span className="text-primary dark:text-primary-foreground">{variante.talla}</span>
+                          <span className="text-sm text-secondary dark:text-secondary-foreground">Stock: {variante.stock}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
                 <div>
-                  <span className="font-medium">Información adicional:</span>
-                  <p className="text-gray-600 mt-2">
+                  <span className="font-medium text-primary dark:text-primary-foreground">Información adicional:</span>
+                  <p className="text-secondary dark:text-secondary-foreground mt-2">
                     Este producto está diseñado para brindar la mejor calidad y satisfacción a tu mascota.
                     Todos nuestros productos pasan por rigurosos controles de calidad antes de llegar a ti.
                   </p>

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, Montserrat } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from '@/components/home/navbar';
-import { Footer } from '@/components/home/footer';
+import { ConditionalLayout } from '@/components/conditional-layout';
 import { Toaster } from 'sonner';
 
 import "./globals.css";
@@ -137,9 +136,9 @@ export default function RootLayout({
       </head>
       <body className={`${poppins.variable} ${montserrat.variable} font-montserrat antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <Navbar />
-          {children}
-          <Footer />
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
           <Toaster 
             position="bottom-right"
             richColors
@@ -152,3 +151,4 @@ export default function RootLayout({
     </html>
   );
 }
+

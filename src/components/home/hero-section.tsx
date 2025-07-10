@@ -23,7 +23,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="w-full flex flex-col justify-center bg-primary dark:bg-primary relative overflow-hidden">
+    <section className="w-full flex flex-col justify-center bg-secondary dark:bg-secondary relative overflow-hidden">
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-10 ">
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[70vh]">
@@ -74,7 +74,7 @@ export function HeroSection() {
                 {/* Main dog image */}
                 <div className="relative w-full h-full">
                   <Image
-                    src="https://res.cloudinary.com/dhzl31kb8/image/upload/v1750176508/Fondo_para_banner_uk2nmy.png"
+                    src="https://res.cloudinary.com/dhzl31kb8/image/upload/v1751399917/Fondo_Landing_Page_desaturada_ryz6cg.png"
                     alt="Perro y gato - Accesorios premium Mis Huellitas"
                     fill
                     priority

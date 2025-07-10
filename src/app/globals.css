@@ -97,41 +97,41 @@
       /* Base colors - Mis Huellitas Blue palette */
       --background: 214 100% 97%; /* #F0F8FF - Light blue background */
       --foreground: 212 47% 15%; /* #1E3A5F - Dark blue text */
-  
+
       --card: 214 100% 97%; /* #F0F8FF */
       --card-foreground: 212 47% 15%; /* #1E3A5F */
-  
+
       --popover: 214 100% 97%; /* #F0F8FF */
       --popover-foreground: 212 47% 15%; /* #1E3A5F */
-  
+
       /* Primary color - Deep Blue */
       --primary: 212 47% 25%; /* #2E5A8A - Primary blue */
       --primary-foreground: 0 0% 100%; /* White text on blue */
-  
+
       /* Secondary color - Medium Blue */
       --secondary: 205 45% 32%; /* #4A90C2 - Secondary blue */
       --secondary-foreground: 0 0% 100%; /* White text */
-  
+
       /* Accent color - Light Blue for interactive elements */
       --accent: 204 88% 65%; /* #5DADE2 - Light blue accent */
       --accent-foreground: 212 47% 15%; /* Dark blue text */
-  
+
       /* Highlight color - Bright Blue for special elements */
       --highlight: 202 91% 58%; /* #3498DB - Bright blue */
       --highlight-foreground: 0 0% 100%; /* White text */
-  
+
       /* Muted - For subtle backgrounds */
       --muted: 214 32% 91%; /* #E8F4F8 - Very light blue */
       --muted-foreground: 212 47% 40%; /* Medium blue text */
-  
+
       /* System colors */
       --destructive: 0 84% 60%;
       --destructive-foreground: 0 0% 100%;
-  
+
       --border: 214 32% 85%; /* Light blue border */
       --input: 214 32% 90%; /* Light blue input */
       --ring: 206 61% 45%; /* Secondary blue */
-  
+
       --radius: 0.5rem;
     }
   }
@@ -149,10 +149,10 @@
 
     /* Primary color in dark mode */
     --primary: 212 47% 25%; /* #5DADE2 - Light blue */
-    --primary-foreground: 212 47% 8%;
+    --primary-foreground: 212 0% 100%;
 
     /* Secondary color in dark mode */
-    --secondary: 206 61% 35%; /* #2E5A8A - Darker blue */
+    --secondary: 205 45% 31%; /* #2E5A8A - Darker blue */
     --secondary-foreground: 214 100% 97%;
 
     /* Accent color in dark mode */
@@ -169,9 +169,8 @@
 
     --border: 212 47% 20%; /* Dark blue border */
     --input: 212 47% 20%; /* Dark blue input */
-    --ring: 204 88% 65%; /* Light blue ring */
+    --ring: 204 88% 65%; /* Light blue ring */ --sidebar: hsl(240 5.9% 10%); --sidebar-foreground: hsl(240 4.8% 95.9%); --sidebar-primary: hsl(224.3 76.3% 48%); --sidebar-primary-foreground: hsl(0 0% 100%); --sidebar-accent: hsl(240 3.7% 15.9%); --sidebar-accent-foreground: hsl(240 4.8% 95.9%); --sidebar-border: hsl(240 3.7% 15.9%); --sidebar-ring: hsl(217.2 91.2% 59.8%);
   }
-
 
 @layer base {
   * {
@@ -197,7 +196,15 @@
   --animate-wave-gentle: wave-gentle 4s ease-in-out infinite;
   --animate-curve-slide: curve-slide 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --animate-organic-pulse: organic-pulse 3s ease-in-out infinite;
-  
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
   @keyframes grid {
   0% {
     transform: translateY(-50%);
@@ -206,7 +213,7 @@
     transform: translateY(0);
     }
   }
-  
+
   @keyframes float {
     0%, 100% {
       transform: translateY(0px);
@@ -215,7 +222,7 @@
       transform: translateY(-20px);
     }
   }
-  
+
   @keyframes slide-in-left {
     0% {
       opacity: 0;
@@ -226,7 +233,7 @@
       transform: translateX(0);
     }
   }
-  
+
   @keyframes slide-in-right {
     0% {
       opacity: 0;
@@ -237,7 +244,7 @@
       transform: translateX(0);
     }
   }
-  
+
   @keyframes fade-in-up {
     0% {
       opacity: 0;
@@ -409,4 +416,32 @@ body {
 [data-sonner-toaster] [data-sonner-toast][data-type="warning"] {
   background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent) / 0.8));
   color: white;
+}
+
+/* 
+  ---break--- 
+*/
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+/* 
+  ---break--- 
+*/
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
