@@ -2,8 +2,11 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { Producto } from '@/lib/placeholder-data';
+import { variantesProductos, imagenesProductos } from '@/lib/placeholder-data';
+import { useCartStore } from '@/lib/store/useCartStore';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   producto: Producto;
@@ -11,6 +14,59 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ producto, imagen }: ProductCardProps) {
+  const addItem = useCartStore(state => state.addItem);
+
+  /**
+   * Agregar producto al carrito con la primera variante disponible
+   */
+  const handleAddToCart = () => {
+    // Obtener variantes del producto
+    const productVariants = variantesProductos.filter(v => v.product_id === producto.id);
+    
+    // Si no hay variantes, usar el producto base
+    if (productVariants.length === 0) {
+      const cartItem = {
+        id: producto.id,
+        name: producto.nombre,
+        price: producto.precio,
+        quantity: 1,
+        size: 'Única',
+        image_url: imagen || '/icons/perro.png',
+        variant_id: `${producto.id}-default`,
+        max_stock: producto.stock,
+        slug: producto.slug
+      };
+      
+      addItem(cartItem);
+      toast.success(`🐾 ${producto.nombre} agregado al carrito!`);
+      return;
+    }
+
+    // Obtener la primera variante con stock disponible
+    const firstAvailableVariant = productVariants.find(v => v.stock > 0);
+    
+    if (!firstAvailableVariant) {
+      toast.error('🐾 Producto sin stock disponible');
+      return;
+    }
+
+    // Crear objeto CartItem
+    const cartItem = {
+      id: producto.id,
+      name: producto.nombre,
+      price: producto.precio,
+      quantity: 1,
+      size: firstAvailableVariant.talla,
+      image_url: imagen || '/icons/perro.png',
+      variant_id: firstAvailableVariant.id,
+      max_stock: firstAvailableVariant.stock,
+      slug: producto.slug
+    };
+
+    addItem(cartItem);
+    toast.success(`🐾 ${producto.nombre} (${firstAvailableVariant.talla}) agregado al carrito!`);
+  };
+
   return (
     <Card className="flex flex-col h-full py-0">
       <Link href={`/productos/${producto.slug}`} className="block">
@@ -28,7 +84,12 @@ export function ProductCard({ producto, imagen }: ProductCardProps) {
           <Button asChild variant="outline">
             <Link href={`/productos/${producto.slug}`}>Ver detalle</Link>
           </Button>
-          <Button variant="secondary" size="icon" aria-label="Agregar al carrito">
+          <Button 
+            variant="secondary" 
+            size="icon" 
+            aria-label="Agregar al carrito"
+            onClick={handleAddToCart}
+          >
             <FontAwesomeIcon icon={faShoppingCart} className="h-5 w-5" />
           </Button>
         </div>

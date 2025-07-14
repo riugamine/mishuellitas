@@ -67,7 +67,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r-0">
       <SidebarHeader className="border-b border-sidebar-border bg-sidebar">
-        <div className="flex items-center gap-3 px-4 py-4">
+        <div className="flex items-center gap-3  py-4">
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-sidebar-primary-foreground shadow-sm">
             <FontAwesomeIcon icon={faPaw} className="size-4" />
           </div>
@@ -88,7 +88,7 @@ export function AppSidebar() {
             Navegación
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-2 px-3">
+            <SidebarMenu className="gap-2">
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton

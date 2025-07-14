@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { productos, categorias, imagenesProductos, variantesProductos } from '@/lib/placeholder-data';
+import { useCartStore } from '@/lib/store/useCartStore';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -39,6 +40,9 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMainImage, setSelectedMainImage] = useState<string | null>(null);
   const router = useRouter();
+  
+  // Store del carrito
+  const addItem = useCartStore(state => state.addItem);
   
   // Resolve async params and set product data
   React.useEffect(() => {
@@ -78,38 +82,127 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   
   // Handle add to cart
   const handleAddToCart = () => {
-    if (!selectedVariant && variantes.length > 0) {
+    if (!product) return;
+    
+    // Si hay variantes pero no se seleccionó una
+    if (variantes.length > 0 && !selectedVariant) {
       toast.error('🐾 Por favor selecciona una variante');
       return;
     }
     
-    const variant = variantes.find(v => v.id === selectedVariant);
-    if (variant && quantity > variant.stock) {
-      toast.error('🐾 No hay suficiente stock disponible');
-      return;
+    let cartItem;
+    
+    if (variantes.length > 0) {
+      // Producto con variantes
+      const variant = variantes.find(v => v.id === selectedVariant);
+      if (!variant) {
+        toast.error('🐾 Variante no encontrada');
+        return;
+      }
+      
+      if (quantity > variant.stock) {
+        toast.error('🐾 No hay suficiente stock disponible');
+        return;
+      }
+      
+      cartItem = {
+        id: product.id,
+        name: product.nombre,
+        price: product.precio,
+        quantity: quantity,
+        size: variant.talla,
+        image_url: primaryImage || '/icons/perro.png',
+        variant_id: variant.id,
+        max_stock: variant.stock,
+        slug: product.slug
+      };
+    } else {
+      // Producto sin variantes
+      if (quantity > product.stock) {
+        toast.error('🐾 No hay suficiente stock disponible');
+        return;
+      }
+      
+      cartItem = {
+        id: product.id,
+        name: product.nombre,
+        price: product.precio,
+        quantity: quantity,
+        size: 'Única',
+        image_url: primaryImage || '/icons/perro.png',
+        variant_id: `${product.id}-default`,
+        max_stock: product.stock,
+        slug: product.slug
+      };
     }
     
-    toast.success(`🐾 ¡${product?.nombre || 'Producto'} agregado al carrito!`);
-    // Here you would typically add to cart state management
+    addItem(cartItem);
+    toast.success(`🐾 ${product.nombre} agregado al carrito!`);
   };
   
-  // Handle buy now - redirect to cart page
+  // Handle buy now - add to cart and redirect
   const handleBuyNow = () => {
-    if (!selectedVariant && variantes.length > 0) {
+    if (!product) return;
+    
+    // Si hay variantes pero no se seleccionó una
+    if (variantes.length > 0 && !selectedVariant) {
       toast.error('🐾 Por favor selecciona una variante');
       return;
     }
     
-    const variant = variantes.find(v => v.id === selectedVariant);
-    if (variant && quantity > variant.stock) {
-      toast.error('🐾 No hay suficiente stock disponible');
-      return;
+    let cartItem;
+    
+    if (variantes.length > 0) {
+      // Producto con variantes
+      const variant = variantes.find(v => v.id === selectedVariant);
+      if (!variant) {
+        toast.error('🐾 Variante no encontrada');
+        return;
+      }
+      
+      if (quantity > variant.stock) {
+        toast.error('🐾 No hay suficiente stock disponible');
+        return;
+      }
+      
+      cartItem = {
+        id: product.id,
+        name: product.nombre,
+        price: product.precio,
+        quantity: quantity,
+        size: variant.talla,
+        image_url: primaryImage || '/icons/perro.png',
+        variant_id: variant.id,
+        max_stock: variant.stock,
+        slug: product.slug
+      };
+    } else {
+      // Producto sin variantes
+      if (quantity > product.stock) {
+        toast.error('🐾 No hay suficiente stock disponible');
+        return;
+      }
+      
+      cartItem = {
+        id: product.id,
+        name: product.nombre,
+        price: product.precio,
+        quantity: quantity,
+        size: 'Única',
+        image_url: primaryImage || '/icons/perro.png',
+        variant_id: `${product.id}-default`,
+        max_stock: product.stock,
+        slug: product.slug
+      };
     }
     
-    toast.success('🐾 ¡Redirigiendo al carrito!');
-    // Add to cart first, then redirect
-    // Here you would typically add to cart state management
-    router.push('/carrito');
+    addItem(cartItem);
+    toast.success('🐾 Producto agregado al carrito! Redirigiendo...');
+    
+    // Redirigir al carrito después de un breve delay
+    setTimeout(() => {
+      router.push('/carrito');
+    }, 1000);
   };
   
   // Calcula currentStock solo cuando los datos estén listos
