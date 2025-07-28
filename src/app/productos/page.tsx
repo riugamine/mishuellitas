@@ -69,18 +69,18 @@ function DrawerDecorativeElements() {
 
 export default function ProductosPage() {
   // Estado para filtros
-  const [categoria, setCategoria] = useState<string>(categorias[0]?.id || '');
+  const [categoria, setCategoria] = useState<string>('todos');
   const [precio, setPrecio] = useState<[number, number]>([0, 500]);
   const [soloStock, setSoloStock] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [tempCategoria, setTempCategoria] = useState<string>(categoria);
+  const [tempCategoria, setTempCategoria] = useState<string>('todos');
   const [tempPrecio, setTempPrecio] = useState<[number, number]>(precio);
   const [tempSoloStock, setTempSoloStock] = useState(soloStock);
 
   // Filtrado de productos por categoría, precio y stock
   const productosFiltrados = (catId: string) =>
     productos.filter((p) => {
-      const enCategoria = p.categoria_id === catId;
+      const enCategoria = catId === 'todos' || p.categoria_id === catId;
       const enPrecio = p.precio >= precio[0] && p.precio <= precio[1];
       const enStock = !soloStock || p.stock > 0;
       return enCategoria && enPrecio && enStock;
@@ -149,6 +149,16 @@ export default function ProductosPage() {
                 <h3 className="text-sm font-semibold mb-2 text-center">Categoría</h3>
                 <Tabs value={tempCategoria} onValueChange={setTempCategoria} className="w-full">
                   <TabsList className="flex flex-wrap justify-center gap-2 bg-muted/50 border border-secondary/20 rounded-2xl p-1">
+                    <TabsTrigger
+                      key="todos"
+                      value="todos"
+                      className="font-poppins text-xs sm:text-sm px-3 py-1.5 rounded-xl data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground transition-all duration-300"
+                      role="tab"
+                      aria-selected={tempCategoria === 'todos'}
+                      tabIndex={tempCategoria === 'todos' ? 0 : -1}
+                    >
+                      Todos
+                    </TabsTrigger>
                     {categorias.map((cat) => (
                       <TabsTrigger
                         key={cat.id}

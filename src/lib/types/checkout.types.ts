@@ -14,13 +14,9 @@ export interface CustomerData {
   email: string;
   phone: string;
   dni: string;
-  address: string;
-  city: string;
-  state: string;
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
+  address?: string;
+  city?: string;
+  state?: string;
 }
 
 export interface PaymentMethod {
@@ -46,10 +42,31 @@ export interface OrderSummary {
   total: number;
 }
 
+// Tipos para opciones de envío
+export type ShippingType = 'nacional' | 'local';
+
+export interface NationalShipping {
+  type: 'nacional';
+  company: 'zoom' | 'mrw';
+  address: string;
+}
+
+export interface LocalShipping {
+  type: 'local';
+  method: 'delivery' | 'pickup';
+  address?: string; // Solo requerido para delivery
+}
+
+export interface ShippingData {
+  shippingType: ShippingType;
+  nationalShipping?: NationalShipping;
+  localShipping?: LocalShipping;
+}
+
 export interface OrderData {
   customer: CustomerData;
   paymentMethod: string;
-  shippingMethod?: string;
+  shippingData: ShippingData;
   items: Array<{
     id: string;
     name: string;
@@ -60,10 +77,6 @@ export interface OrderData {
   }>;
   summary: OrderSummary;
   notes?: string;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
 }
 
 // Constantes para métodos de pago
@@ -100,26 +113,52 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
   },
 ];
 
-// Constantes para métodos de envío
-export const SHIPPING_METHODS: ShippingMethod[] = [
+// Constantes para opciones de envío
+export const SHIPPING_TYPES = [
   {
-    id: 'standard',
-    name: 'Envío Standard',
-    description: 'Entrega en 3-5 días hábiles',
-    price: 25,
-    estimatedDays: 4,
+    id: 'nacional',
+    name: 'Envío Nacional',
+    description: 'A todo el territorio venezolano',
+    icon: '🇻🇪',
   },
   {
-    id: 'express',
-    name: 'Envío Express',
-    description: 'Entrega en 1-2 días hábiles',
-    price: 50,
-    estimatedDays: 1,
+    id: 'local',
+    name: 'Envío Local Nueva Esparta',
+    description: 'Isla de Margarita y Nueva Esparta',
+    icon: '🏝️',
+  },
+];
+
+export const NATIONAL_SHIPPING_COMPANIES = [
+  {
+    id: 'zoom',
+    name: 'Zoom',
+    description: 'Entrega segura a nivel nacional',
+    estimatedDays: '2-5 días hábiles',
+  },
+  {
+    id: 'mrw',
+    name: 'MRW',
+    description: 'Envío confiable a todo el país',
+    estimatedDays: '2-5 días hábiles',
+  },
+];
+
+export const LOCAL_SHIPPING_METHODS = [
+  {
+    id: 'delivery',
+    name: 'Delivery',
+    description: 'Entrega a domicilio en Nueva Esparta',
+    price: 'por zona', // Rango: REF 2-5
+    priceRange: {
+      min: 2,
+      max: 5
+    },
   },
   {
     id: 'pickup',
-    name: 'Recoger en tienda',
-    description: 'Retira tu pedido en nuestra tienda',
+    name: 'Pickup',
+    description: 'Recoger en nuestra ubicación',
     price: 0,
   },
 ];

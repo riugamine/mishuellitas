@@ -1,6 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+interface PlacaPersonalization {
+  nombre_mascota: string;
+  forma_id: string;
+  color_id: string;
+  tipografia_id: string;
+  icono_id?: string;
+  precio_adicional: number;
+}
+
 interface CartItem {
   id: string;
   name: string;
@@ -11,6 +20,8 @@ interface CartItem {
   variant_id: string;
   max_stock: number;
   slug: string;
+  personalizacion?: PlacaPersonalization;
+  tipo_producto?: 'normal' | 'placa';
 }
 
 interface CartStore {

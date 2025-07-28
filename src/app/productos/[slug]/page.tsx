@@ -2,7 +2,17 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { productos, categorias, imagenesProductos, variantesProductos } from '@/lib/placeholder-data';
+import { 
+  productos, 
+  categorias, 
+  imagenesProductos, 
+  variantesProductos,
+  formasPlacas,
+  coloresPlacas,
+  tipografiasPlacas,
+  iconosPlacas,
+  type PersonalizacionPlaca
+} from '@/lib/placeholder-data';
 import { useCartStore } from '@/lib/store/useCartStore';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +24,11 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { ProductCard } from '@/components/product/product-card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaw, faHeart, faStar, faDog, faCat, faHome } from '@fortawesome/free-solid-svg-icons';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 // Types for the component
 interface ProductDetailPageProps {
@@ -40,9 +55,47 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMainImage, setSelectedMainImage] = useState<string | null>(null);
   const router = useRouter();
+
+  // Estados para personalización de placas
+  const [placaPersonalization, setPlacaPersonalization] = useState<PersonalizacionPlaca>({
+    nombre_mascota: '',
+    forma_id: '',
+    color_id: '',
+    tipografia_id: '',
+    icono_id: '',
+  });
+  const [placaPreview, setPlacaPreview] = useState({
+    precioTotal: 0,
+    resumen: '',
+  });
   
   // Store del carrito
   const addItem = useCartStore(state => state.addItem);
+
+  // Funciones auxiliares para placas
+  const getIconComponent = (iconCode: string) => {
+    const iconMap: any = {
+      'faPaw': faPaw,
+      'faHeart': faHeart,
+      'faStar': faStar,
+      'faDog': faDog,
+      'faCat': faCat,
+      'faHome': faHome,
+    };
+    return iconMap[iconCode] || faPaw;
+  };
+
+  const calculatePlacaPrice = () => {
+    // Ahora todas las opciones son estándar, solo devolvemos el precio base
+    return product?.precio || 0;
+  };
+
+  const updatePlacaPersonalization = (field: keyof PersonalizacionPlaca, value: string) => {
+    setPlacaPersonalization(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
   
   // Resolve async params and set product data
   React.useEffect(() => {
@@ -56,6 +109,16 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           setCategoria(getCategoriaById(productData.categoria_id));
           setImagenes(getImagenesByProductId(productData.id));
           setVariantes(getVariantesByProductId(productData.id));
+          
+          // Si es una placa, inicializar valores por defecto
+          if (productData.tipo === 'placa') {
+            setPlacaPersonalization(prev => ({
+              ...prev,
+              forma_id: formasPlacas[0]?.id || '',
+              color_id: coloresPlacas[0]?.id || '',
+              tipografia_id: tipografiasPlacas[0]?.id || '',
+            }));
+          }
         }
       } catch (error) {
         console.error('Error loading product:', error);
@@ -66,6 +129,17 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     
     loadProductData();
   }, [params]);
+
+  // Actualizar precio cuando cambie la personalización
+  React.useEffect(() => {
+    if (product && product.tipo === 'placa') {
+      const precioTotal = calculatePlacaPrice();
+      setPlacaPreview({
+        precioTotal,
+        resumen: `${placaPersonalization.nombre_mascota || 'Tu mascota'}`,
+      });
+    }
+  }, [placaPersonalization, product]);
   
   // Handle variant selection
   const handleVariantChange = (value: string) => {
@@ -83,6 +157,18 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   // Handle add to cart
   const handleAddToCart = () => {
     if (!product) return;
+
+    // Validaciones para placas personalizadas
+    if (product.tipo === 'placa') {
+      if (!placaPersonalization.nombre_mascota.trim()) {
+        toast.error('🐾 Por favor ingresa el nombre de tu mascota');
+        return;
+      }
+      if (!placaPersonalization.forma_id || !placaPersonalization.color_id || !placaPersonalization.tipografia_id) {
+        toast.error('🐾 Por favor completa todas las opciones de personalización');
+        return;
+      }
+    }
     
     // Si hay variantes pero no se seleccionó una
     if (variantes.length > 0 && !selectedVariant) {
@@ -91,6 +177,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     }
     
     let cartItem;
+    const finalPrice = product.tipo === 'placa' ? calculatePlacaPrice() : product.precio;
     
     if (variantes.length > 0) {
       // Producto con variantes
@@ -108,13 +195,18 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       cartItem = {
         id: product.id,
         name: product.nombre,
-        price: product.precio,
+        price: finalPrice,
         quantity: quantity,
         size: variant.talla,
         image_url: primaryImage || '/icons/perro.png',
         variant_id: variant.id,
         max_stock: variant.stock,
-        slug: product.slug
+        slug: product.slug,
+        tipo_producto: product.tipo || 'normal',
+        personalizacion: product.tipo === 'placa' ? {
+          ...placaPersonalization,
+          precio_adicional: 0,
+        } : undefined,
       };
     } else {
       // Producto sin variantes
@@ -126,13 +218,18 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       cartItem = {
         id: product.id,
         name: product.nombre,
-        price: product.precio,
+        price: finalPrice,
         quantity: quantity,
         size: 'Única',
         image_url: primaryImage || '/icons/perro.png',
         variant_id: `${product.id}-default`,
         max_stock: product.stock,
-        slug: product.slug
+        slug: product.slug,
+        tipo_producto: product.tipo || 'normal',
+        personalizacion: product.tipo === 'placa' ? {
+          ...placaPersonalization,
+          precio_adicional: 0,
+        } : undefined,
       };
     }
     
@@ -143,6 +240,18 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   // Handle buy now - add to cart and redirect
   const handleBuyNow = () => {
     if (!product) return;
+
+    // Validaciones para placas personalizadas
+    if (product.tipo === 'placa') {
+      if (!placaPersonalization.nombre_mascota.trim()) {
+        toast.error('🐾 Por favor ingresa el nombre de tu mascota');
+        return;
+      }
+      if (!placaPersonalization.forma_id || !placaPersonalization.color_id || !placaPersonalization.tipografia_id) {
+        toast.error('🐾 Por favor completa todas las opciones de personalización');
+        return;
+      }
+    }
     
     // Si hay variantes pero no se seleccionó una
     if (variantes.length > 0 && !selectedVariant) {
@@ -151,6 +260,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     }
     
     let cartItem;
+    const finalPrice = product.tipo === 'placa' ? calculatePlacaPrice() : product.precio;
     
     if (variantes.length > 0) {
       // Producto con variantes
@@ -168,13 +278,18 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       cartItem = {
         id: product.id,
         name: product.nombre,
-        price: product.precio,
+        price: finalPrice,
         quantity: quantity,
         size: variant.talla,
         image_url: primaryImage || '/icons/perro.png',
         variant_id: variant.id,
         max_stock: variant.stock,
-        slug: product.slug
+        slug: product.slug,
+        tipo_producto: product.tipo || 'normal',
+        personalizacion: product.tipo === 'placa' ? {
+          ...placaPersonalization,
+          precio_adicional: 0,
+        } : undefined,
       };
     } else {
       // Producto sin variantes
@@ -186,13 +301,18 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       cartItem = {
         id: product.id,
         name: product.nombre,
-        price: product.precio,
+        price: finalPrice,
         quantity: quantity,
         size: 'Única',
         image_url: primaryImage || '/icons/perro.png',
         variant_id: `${product.id}-default`,
         max_stock: product.stock,
-        slug: product.slug
+        slug: product.slug,
+        tipo_producto: product.tipo || 'normal',
+        personalizacion: product.tipo === 'placa' ? {
+          ...placaPersonalization,
+          precio_adicional: 0,
+        } : undefined,
       };
     }
     
@@ -347,7 +467,14 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           
           {/* Price */}
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-primary">REF {product.precio.toFixed(2)}</span>
+            <span className="text-3xl font-bold text-primary">
+              REF {(product.tipo === 'placa' ? placaPreview.precioTotal : product.precio).toFixed(2)}
+            </span>
+            {product.tipo === 'placa' && placaPreview.precioTotal > product.precio && (
+              <span className="text-lg text-gray-500 line-through">
+                REF {product.precio.toFixed(2)}
+              </span>
+            )}
             {currentStock <= 5 && currentStock > 0 && (
               <Badge variant="destructive" className="text-xs">
                 Solo {currentStock} disponibles
@@ -388,6 +515,182 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 </SelectContent>
               </Select>
             </div>
+          )}
+
+          {/* Personalización de Placas */}
+          {product.tipo === 'placa' && (
+            <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200">
+              <h3 className="text-xl font-semibold mb-4 text-center text-blue-800">
+                🏷️ Personaliza tu Placa
+              </h3>
+              
+              <div className="space-y-6">
+                {/* Nombre de la mascota */}
+                <div className="space-y-2">
+                  <Label htmlFor="nombreMascota" className="text-sm font-medium text-gray-700">
+                    Nombre de tu mascota *
+                  </Label>
+                  <Input
+                    id="nombreMascota"
+                    type="text"
+                    value={placaPersonalization.nombre_mascota}
+                    onChange={(e) => updatePlacaPersonalization('nombre_mascota', e.target.value)}
+                    placeholder="Ej: Max, Luna, Rocky..."
+                    maxLength={20}
+                    className="text-center font-bold"
+                  />
+                  <p className="text-xs text-gray-500 text-center">
+                    Máximo 20 caracteres
+                  </p>
+                </div>
+
+                {/* Forma de la placa */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-gray-700">Forma de la placa:</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {formasPlacas.map((forma) => (
+                      <button
+                        key={forma.id}
+                        type="button"
+                        onClick={() => updatePlacaPersonalization('forma_id', forma.id)}
+                        className={`p-3 border rounded-lg text-center transition-all ${
+                          placaPersonalization.forma_id === forma.id
+                            ? 'border-blue-500 bg-blue-100 text-blue-800'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <div className="font-medium">{forma.nombre}</div>
+                        <div className="text-xs text-gray-600">{forma.descripcion}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Color de la placa */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-gray-700">Color de la placa:</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {coloresPlacas.map((color) => (
+                      <button
+                        key={color.id}
+                        type="button"
+                        onClick={() => updatePlacaPersonalization('color_id', color.id)}
+                        className={`p-3 border rounded-lg text-center transition-all ${
+                          placaPersonalization.color_id === color.id
+                            ? 'border-blue-500 bg-blue-100'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded-full border border-gray-300"
+                            style={{ backgroundColor: color.codigo_hex }}
+                          />
+                          <span className="font-medium">{color.nombre}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tipografía */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-gray-700">Tipografía:</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {tipografiasPlacas.map((tipografia) => (
+                      <button
+                        key={tipografia.id}
+                        type="button"
+                        onClick={() => updatePlacaPersonalization('tipografia_id', tipografia.id)}
+                        className={`p-3 border rounded-lg text-center transition-all ${
+                          placaPersonalization.tipografia_id === tipografia.id
+                            ? 'border-blue-500 bg-blue-100'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <div 
+                          className="font-medium mb-1"
+                          style={{ fontFamily: tipografia.font_family }}
+                        >
+                          {tipografia.nombre}
+                        </div>
+                        <div 
+                          className="text-sm text-gray-600"
+                          style={{ fontFamily: tipografia.font_family }}
+                        >
+                          {placaPersonalization.nombre_mascota || 'Ejemplo'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Icono opcional */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-gray-700">Icono (opcional):</Label>
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                    <button
+                      key="sin-icono"
+                      type="button"
+                      onClick={() => updatePlacaPersonalization('icono_id', '')}
+                      className={`p-3 border rounded-lg text-center transition-all ${
+                        !placaPersonalization.icono_id
+                          ? 'border-blue-500 bg-blue-100'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      <div className="text-xs font-medium">Sin icono</div>
+                    </button>
+                    {iconosPlacas.map((icono) => (
+                      <button
+                        key={icono.id}
+                        type="button"
+                        onClick={() => updatePlacaPersonalization('icono_id', icono.id)}
+                        className={`p-3 border rounded-lg text-center transition-all ${
+                          placaPersonalization.icono_id === icono.id
+                            ? 'border-blue-500 bg-blue-100'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                      >
+                        <FontAwesomeIcon 
+                          icon={getIconComponent(icono.codigo_icon)} 
+                          className="text-lg mb-1"
+                        />
+                        <div className="text-xs font-medium">{icono.nombre}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Vista previa */}
+                <div className="p-4 bg-white rounded-lg border-2 border-dashed border-gray-300">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2 text-center">Vista previa:</h4>
+                  <div className="flex items-center justify-center">
+                    <div 
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2"
+                      style={{ 
+                        backgroundColor: coloresPlacas.find(c => c.id === placaPersonalization.color_id)?.codigo_hex || '#C0C0C0',
+                        color: placaPersonalization.color_id === 'color3' ? 'white' : 'black',
+                        fontFamily: tipografiasPlacas.find(t => t.id === placaPersonalization.tipografia_id)?.font_family || 'sans-serif'
+                      }}
+                    >
+                      {placaPersonalization.icono_id && (
+                        <FontAwesomeIcon 
+                          icon={getIconComponent(iconosPlacas.find(i => i.id === placaPersonalization.icono_id)?.codigo_icon || 'faPaw')} 
+                          className="text-sm"
+                        />
+                      )}
+                      <span className="font-bold">
+                        {placaPersonalization.nombre_mascota || 'Tu Mascota'}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 text-center mt-2">
+                    Precio total: REF {placaPreview.precioTotal.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            </Card>
           )}
           
           {/* Quantity */}

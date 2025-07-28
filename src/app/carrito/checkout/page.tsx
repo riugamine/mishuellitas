@@ -18,16 +18,27 @@ import { useCartStore } from '@/lib/store/useCartStore';
 import { useCustomerStore } from '@/lib/store/useCustomerStore';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { GoogleMapsPicker } from '@/components/ui/google-maps-picker';
 import { 
-  LocationData, 
   CustomerData, 
   PaymentMethod, 
+  ShippingType,
+  ShippingData,
+  NationalShipping,
+  LocalShipping,
   PAYMENT_METHODS, 
+  SHIPPING_TYPES,
+  NATIONAL_SHIPPING_COMPANIES,
+  LOCAL_SHIPPING_METHODS,
   VENEZUELA_CONFIG, 
   WHATSAPP_CONFIG,
   FREE_SHIPPING_THRESHOLD 
 } from '@/lib/types/checkout.types';
+import { 
+  formasPlacas, 
+  coloresPlacas, 
+  tipografiasPlacas, 
+  iconosPlacas 
+} from '@/lib/placeholder-data';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -45,10 +56,10 @@ export default function CheckoutPage() {
     address: customerInfo.address || '',
     city: '',
     state: '',
-    coordinates: {
-      lat: 0,
-      lng: 0,
-    },
+  });
+
+  const [shippingData, setShippingData] = useState<ShippingData>({
+    shippingType: 'nacional',
   });
 
   // Calcular totales
@@ -57,8 +68,25 @@ export default function CheckoutPage() {
   }, [items]);
 
   const shippingCost = useMemo(() => {
-    return subtotal > FREE_SHIPPING_THRESHOLD ? 0 : 25;
-  }, [subtotal]);
+    // Envío gratis si supera el threshold
+    if (subtotal > FREE_SHIPPING_THRESHOLD) return 0;
+    
+    // Costo según tipo de envío
+    if (shippingData.shippingType === 'local' && shippingData.localShipping) {
+      const method = LOCAL_SHIPPING_METHODS.find(m => m.id === shippingData.localShipping?.method);
+      if (method && method.id === 'pickup') return 0;
+      // Para delivery, no añadimos costo fijo ya que es "por zona"
+    }
+    
+    // Envío nacional (se coordina con la empresa)
+    return 0;
+  }, [subtotal, shippingData]);
+
+  const isDeliveryByZone = useMemo(() => {
+    return shippingData.shippingType === 'local' && 
+           shippingData.localShipping?.method === 'delivery' && 
+           subtotal <= FREE_SHIPPING_THRESHOLD;
+  }, [shippingData, subtotal]);
 
   const total = subtotal + shippingCost;
 
@@ -73,17 +101,38 @@ export default function CheckoutPage() {
   };
 
   /**
-   * Manejar selección de ubicación
+   * Manejar cambio de tipo de envío
    */
-  const handleLocationSelect = (location: LocationData) => {
-    setCustomerData(prev => ({
+  const handleShippingTypeChange = (type: ShippingType) => {
+    setShippingData({
+      shippingType: type,
+    });
+  };
+
+  /**
+   * Manejar datos de envío nacional
+   */
+  const handleNationalShippingChange = (company: 'zoom' | 'mrw', address: string) => {
+    setShippingData(prev => ({
       ...prev,
-      address: location.address,
-      city: location.city,
-      state: location.state,
-      coordinates: {
-        lat: location.lat,
-        lng: location.lng,
+      nationalShipping: {
+        type: 'nacional',
+        company,
+        address,
+      },
+    }));
+  };
+
+  /**
+   * Manejar datos de envío local
+   */
+  const handleLocalShippingChange = (method: 'delivery' | 'pickup', address?: string) => {
+    setShippingData(prev => ({
+      ...prev,
+      localShipping: {
+        type: 'local',
+        method,
+        address: method === 'delivery' ? address : undefined,
       },
     }));
   };
@@ -92,11 +141,44 @@ export default function CheckoutPage() {
    * Generar mensaje de WhatsApp
    */
   const generateWhatsAppMessage = () => {
-    const itemsList = items.map(item => 
-      `• ${item.name} (${item.size}) - Cantidad: ${item.quantity} - REF ${(item.price * item.quantity).toFixed(2)}`
-    ).join('\n');
+    const itemsList = items.map(item => {
+      let itemDescription = `• ${item.name} (${item.size}) - Cantidad: ${item.quantity} - REF ${(item.price * item.quantity).toFixed(2)}`;
+      
+      // Agregar detalles de personalización si es una placa
+      if (item.tipo_producto === 'placa' && item.personalizacion) {
+        const forma = formasPlacas.find(f => f.id === item.personalizacion?.forma_id);
+        const color = coloresPlacas.find(c => c.id === item.personalizacion?.color_id);
+        const tipografia = tipografiasPlacas.find(t => t.id === item.personalizacion?.tipografia_id);
+        const icono = item.personalizacion.icono_id ? iconosPlacas.find(i => i.id === item.personalizacion?.icono_id) : null;
+        
+                 itemDescription += `\n  🏷️ PERSONALIZACIÓN:`;
+         itemDescription += `\n    • Nombre: ${item.personalizacion.nombre_mascota}`;
+         itemDescription += `\n    • Forma: ${forma?.nombre || 'No especificada'}`;
+         itemDescription += `\n    • Color: ${color?.nombre || 'No especificado'}`;
+         itemDescription += `\n    • Tipografía: ${tipografia?.nombre || 'No especificada'}`;
+         if (icono) {
+           itemDescription += `\n    • Icono: ${icono.nombre}`;
+         }
+      }
+      
+      return itemDescription;
+    }).join('\n');
 
-         const selectedPayment = PAYMENT_METHODS.find((pm: PaymentMethod) => pm.id === selectedPaymentMethod);
+    const selectedPayment = PAYMENT_METHODS.find((pm: PaymentMethod) => pm.id === selectedPaymentMethod);
+    
+    // Información de envío
+    let shippingInfo = '';
+    if (shippingData.shippingType === 'nacional' && shippingData.nationalShipping) {
+      const company = NATIONAL_SHIPPING_COMPANIES.find(c => c.id === shippingData.nationalShipping?.company);
+      shippingInfo = `🚛 *ENVÍO NACIONAL:*
+Empresa: ${company?.name || 'No seleccionada'}
+Dirección: ${shippingData.nationalShipping.address}`;
+    } else if (shippingData.shippingType === 'local' && shippingData.localShipping) {
+      const method = LOCAL_SHIPPING_METHODS.find(m => m.id === shippingData.localShipping?.method);
+      shippingInfo = `🏝️ *ENVÍO LOCAL (Nueva Esparta):*
+Método: ${method?.name || 'No seleccionado'}${shippingData.localShipping.method === 'delivery' ? `
+Dirección: ${shippingData.localShipping.address || 'No especificada'}` : ''}`;
+    }
     
     return `🐾 *NUEVO PEDIDO - MISHUELLITAS.COM*
 
@@ -106,17 +188,15 @@ Cédula: ${customerData.dni}
 Email: ${customerData.email}
 Teléfono: ${customerData.phone}
 
-📍 *DIRECCIÓN DE ENTREGA:*
-${customerData.address}
-${customerData.city}, ${customerData.state}
+${shippingInfo}
 
 📦 *PRODUCTOS:*
 ${itemsList}
 
 💰 *RESUMEN:*
 Subtotal: REF ${subtotal.toFixed(2)}
-Envío: ${shippingCost === 0 ? 'Gratis' : `REF ${shippingCost.toFixed(2)}`}
-Total: REF ${total.toFixed(2)}
+Envío: ${shippingCost === 0 ? 'Gratis' : isDeliveryByZone ? 'Por zona (REF 2-5)' : `REF ${shippingCost.toFixed(2)}`}
+Total: REF ${total.toFixed(2)}${isDeliveryByZone ? ' + envío por zona' : ''}
 
 💳 *MÉTODO DE PAGO:*
 ${selectedPayment?.name || 'No seleccionado'}
@@ -131,12 +211,28 @@ ${orderNotes || 'Ninguna'}
    * Procesar el pedido
    */
   const handleProcessOrder = async () => {
-    // Validar datos requeridos
+    // Validar datos básicos del cliente
     if (!customerData.name || !customerData.lastName || !customerData.email || 
-        !customerData.phone || !customerData.dni || !customerData.address || 
-        !selectedPaymentMethod) {
+        !customerData.phone || !customerData.dni || !selectedPaymentMethod) {
       toast.error('🐾 Por favor completa todos los campos requeridos');
       return;
+    }
+
+    // Validar datos de envío
+    if (shippingData.shippingType === 'nacional') {
+      if (!shippingData.nationalShipping?.company || !shippingData.nationalShipping?.address) {
+        toast.error('🐾 Por favor selecciona la empresa de envío y la dirección');
+        return;
+      }
+    } else if (shippingData.shippingType === 'local') {
+      if (!shippingData.localShipping?.method) {
+        toast.error('🐾 Por favor selecciona el método de entrega local');
+        return;
+      }
+      if (shippingData.localShipping.method === 'delivery' && !shippingData.localShipping.address) {
+        toast.error('🐾 Por favor ingresa la dirección para delivery');
+        return;
+      }
     }
 
     setIsProcessing(true);
@@ -152,7 +248,7 @@ ${orderNotes || 'Ninguna'}
         email: customerData.email,
         phone: customerData.phone,
         dni: customerData.dni,
-        address: customerData.address,
+        address: customerData.address || '', // Mantener compatibilidad
       });
 
              // Generar mensaje de WhatsApp
@@ -300,16 +396,158 @@ ${orderNotes || 'Ninguna'}
               </div>
             </Card>
 
-            {/* Dirección de entrega con Google Maps */}
+            {/* Opciones de envío */}
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">📍 Dirección de Entrega</h2>
+              <h2 className="text-xl font-semibold mb-4">🚛 Opciones de Envío</h2>
               <div className="space-y-4">
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-blue-800 text-sm">
                     <strong>País:</strong> Venezuela 🇻🇪
                   </p>
                 </div>
-                                 <GoogleMapsPicker onLocationSelect={handleLocationSelect} />
+                
+                {/* Selección tipo de envío */}
+                <div className="space-y-3">
+                  {SHIPPING_TYPES.map((type) => (
+                    <div
+                      key={type.id}
+                      className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                        shippingData.shippingType === type.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                      onClick={() => handleShippingTypeChange(type.id as ShippingType)}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="radio"
+                          id={type.id}
+                          name="shippingType"
+                          value={type.id}
+                          checked={shippingData.shippingType === type.id}
+                          onChange={() => handleShippingTypeChange(type.id as ShippingType)}
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <div>
+                          <Label htmlFor={type.id} className="font-medium cursor-pointer">
+                            {type.icon} {type.name}
+                          </Label>
+                          <p className="text-sm text-gray-600">{type.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Opciones para envío nacional */}
+                {shippingData.shippingType === 'nacional' && (
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                    <h3 className="text-lg font-medium">Selecciona la empresa de envío:</h3>
+                    <div className="space-y-3">
+                      {NATIONAL_SHIPPING_COMPANIES.map((company) => (
+                        <div
+                          key={company.id}
+                          className={`p-3 border rounded cursor-pointer ${
+                            shippingData.nationalShipping?.company === company.id
+                              ? 'border-green-500 bg-green-50'
+                              : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                          onClick={() => {
+                            const address = shippingData.nationalShipping?.address || '';
+                            handleNationalShippingChange(company.id as 'zoom' | 'mrw', address);
+                          }}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <input
+                              type="radio"
+                              id={`company-${company.id}`}
+                              name="shippingCompany"
+                              value={company.id}
+                              checked={shippingData.nationalShipping?.company === company.id}
+                              readOnly
+                              className="w-4 h-4 text-green-600"
+                            />
+                            <div>
+                              <Label htmlFor={`company-${company.id}`} className="font-medium cursor-pointer">
+                                {company.name}
+                              </Label>
+                              <p className="text-sm text-gray-600">{company.description}</p>
+                              <p className="text-xs text-gray-500">{company.estimatedDays}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div>
+                      <Label htmlFor="nationalAddress">Dirección de entrega *</Label>
+                      <Textarea
+                        id="nationalAddress"
+                        placeholder="Ingresa la dirección completa donde quieres recibir tu pedido..."
+                        value={shippingData.nationalShipping?.address || ''}
+                        onChange={(e) => {
+                          const company = shippingData.nationalShipping?.company || 'zoom';
+                          handleNationalShippingChange(company as 'zoom' | 'mrw', e.target.value);
+                        }}
+                        className="mt-2 resize-none"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Opciones para envío local */}
+                {shippingData.shippingType === 'local' && (
+                  <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                    <h3 className="text-lg font-medium">Método de entrega en Nueva Esparta:</h3>
+                    <div className="space-y-3">
+                      {LOCAL_SHIPPING_METHODS.map((method) => (
+                        <div
+                          key={method.id}
+                          className={`p-3 border rounded cursor-pointer ${
+                            shippingData.localShipping?.method === method.id
+                              ? 'border-green-500 bg-green-50'
+                              : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                          onClick={() => {
+                            const address = method.id === 'delivery' ? (shippingData.localShipping?.address || '') : undefined;
+                            handleLocalShippingChange(method.id as 'delivery' | 'pickup', address);
+                          }}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <input
+                              type="radio"
+                              id={`local-${method.id}`}
+                              name="localMethod"
+                              value={method.id}
+                              checked={shippingData.localShipping?.method === method.id}
+                              readOnly
+                              className="w-4 h-4 text-green-600"
+                            />
+                            <div>
+                              <Label htmlFor={`local-${method.id}`} className="font-medium cursor-pointer">
+                                {method.name} {method.id === 'pickup' ? '(Gratis)' : '(REF 2-5 por zona)'}
+                              </Label>
+                              <p className="text-sm text-gray-600">{method.description}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {shippingData.localShipping?.method === 'delivery' && (
+                      <div>
+                        <Label htmlFor="deliveryAddress">Dirección para delivery *</Label>
+                        <Textarea
+                          id="deliveryAddress"
+                          placeholder="Ingresa la dirección en Nueva Esparta donde quieres recibir tu pedido..."
+                          value={shippingData.localShipping?.address || ''}
+                          onChange={(e) => handleLocalShippingChange('delivery', e.target.value)}
+                          className="mt-2 resize-none"
+                          rows={3}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </Card>
 
@@ -409,7 +647,7 @@ ${orderNotes || 'Ninguna'}
                 <div className="flex justify-between">
                   <span>Envío:</span>
                   <span className="font-medium">
-                    {shippingCost === 0 ? 'Gratis' : `REF ${shippingCost.toFixed(2)}`}
+                    {shippingCost === 0 ? 'Gratis' : isDeliveryByZone ? 'Por zona (REF 2-5)' : `REF ${shippingCost.toFixed(2)}`}
                   </span>
                 </div>
                                  {shippingCost === 0 && (
@@ -420,8 +658,15 @@ ${orderNotes || 'Ninguna'}
                 <Separator />
                 <div className="flex justify-between text-xl font-bold">
                   <span>Total:</span>
-                  <span className="text-green-600">REF {total.toFixed(2)}</span>
+                  <span className="text-green-600">
+                    REF {total.toFixed(2)}{isDeliveryByZone ? '*' : ''}
+                  </span>
                 </div>
+                {isDeliveryByZone && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    * El costo final incluirá el delivery según zona (REF 2-5)
+                  </p>
+                )}
               </div>
 
               {/* Botón de confirmar pedido */}

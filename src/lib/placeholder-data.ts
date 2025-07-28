@@ -19,6 +19,7 @@ export type Producto = {
   slug: string;
   categoria_id: string;
   is_active: boolean;
+  tipo?: 'normal' | 'placa';
 };
 
 export type ImagenProducto = {
@@ -33,6 +34,44 @@ export type VarianteProducto = {
   product_id: string;
   talla: string;
   stock: number;
+};
+
+// Tipos para plaquitas personalizadas
+export type FormaPlaca = {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  precio_adicional: number;
+};
+
+export type ColorPlaca = {
+  id: string;
+  nombre: string;
+  codigo_hex: string;
+  precio_adicional: number;
+};
+
+export type TipografiaPlaca = {
+  id: string;
+  nombre: string;
+  font_family: string;
+  precio_adicional: number;
+};
+
+export type IconoPlaca = {
+  id: string;
+  nombre: string;
+  categoria: string;
+  codigo_icon: string; // Para FontAwesome o similar
+  precio_adicional: number;
+};
+
+export type PersonalizacionPlaca = {
+  nombre_mascota: string;
+  forma_id: string;
+  color_id: string;
+  tipografia_id: string;
+  icono_id?: string;
 };
 
 // Categorías de ejemplo
@@ -57,6 +96,13 @@ export const categorias: Categoria[] = [
     slug: 'juguetes',
     descripcion: 'Juguetes para el entretenimiento de tu mascota.',
     cover_image_url: 'https://res.cloudinary.com/dhzl31kb8/image/upload/v1749764378/Sudadera_de_dinosaurio_1_nil4pm.png',
+  },
+  {
+    id: '4',
+    nombre: 'Placas',
+    slug: 'placas',
+    descripcion: 'Placas personalizadas para identificar a tu mascota.',
+    cover_image_url: 'https://res.cloudinary.com/dhzl31kb8/image/upload/v1749764397/Sullivan_rosado_2_urmydb.png',
   },
 ];
 
@@ -121,6 +167,28 @@ export const productos: Producto[] = [
     slug: 'raton-juguete',
     categoria_id: '3',
     is_active: true,
+  },
+  {
+    id: 'p7',
+    nombre: 'Placa Personalizada Básica',
+    descripcion: 'Placa personalizada para collar de mascota con grabado del nombre.',
+    precio: 25.0,
+    stock: 100,
+    slug: 'placa-personalizada-basica',
+    categoria_id: '4',
+    is_active: true,
+    tipo: 'placa',
+  },
+  {
+    id: 'p8',
+    nombre: 'Placa Personalizada Premium',
+    descripcion: 'Placa personalizada premium con múltiples opciones de diseño y grabado.',
+    precio: 45.0,
+    stock: 50,
+    slug: 'placa-personalizada-premium',
+    categoria_id: '4',
+    is_active: true,
+    tipo: 'placa',
   },
 ];
 
@@ -216,6 +284,32 @@ export const imagenesProductos: ImagenProducto[] = [
     image_url: 'https://res.cloudinary.com/dhzl31kb8/image/upload/v1749764379/Sudadera_de_dinosaurio_detalle1.png',
     is_primary: false,
   },
+  // Placa Personalizada Básica
+  {
+    id: 'img7',
+    product_id: 'p7',
+    image_url: 'https://res.cloudinary.com/dhzl31kb8/image/upload/v1749764397/Sullivan_rosado_2_urmydb.png',
+    is_primary: true,
+  },
+  {
+    id: 'img7b',
+    product_id: 'p7',
+    image_url: 'https://res.cloudinary.com/dhzl31kb8/image/upload/v1749764398/Sullivan_rosado_detalle1.png',
+    is_primary: false,
+  },
+  // Placa Personalizada Premium
+  {
+    id: 'img8',
+    product_id: 'p8',
+    image_url: 'https://res.cloudinary.com/dhzl31kb8/image/upload/v1749764423/Sudadera_de_tigre_1_n4aj07.png',
+    is_primary: true,
+  },
+  {
+    id: 'img8b',
+    product_id: 'p8',
+    image_url: 'https://res.cloudinary.com/dhzl31kb8/image/upload/v1749764424/Sudadera_de_tigre_detalle1.png',
+    is_primary: false,
+  },
 ];
 
 // Variantes de productos de ejemplo
@@ -238,4 +332,147 @@ export const variantesProductos: VarianteProducto[] = [
   { id: 'v11', product_id: 'p5', talla: 'Única', stock: 30 },
   // Ratón de juguete
   { id: 'v12', product_id: 'p6', talla: 'Única', stock: 25 },
+  // Placa básica
+  { id: 'v13', product_id: 'p7', talla: 'Estándar', stock: 100 },
+  // Placa premium
+  { id: 'v14', product_id: 'p8', talla: 'Estándar', stock: 50 },
+];
+
+// Configuración para placas personalizadas
+export const formasPlacas: FormaPlaca[] = [
+  {
+    id: 'forma1',
+    nombre: 'Redonda',
+    descripcion: 'Placa circular clásica',
+    precio_adicional: 0,
+  },
+  {
+    id: 'forma2',
+    nombre: 'Rectangular',
+    descripcion: 'Placa rectangular tradicional',
+    precio_adicional: 0,
+  },
+  {
+    id: 'forma3',
+    nombre: 'Hueso',
+    descripcion: 'Forma de hueso divertida',
+    precio_adicional: 0,
+  },
+  {
+    id: 'forma4',
+    nombre: 'Corazón',
+    descripcion: 'Forma de corazón adorable',
+    precio_adicional: 0,
+  },
+  {
+    id: 'forma5',
+    nombre: 'Estrella',
+    descripcion: 'Forma de estrella única',
+    precio_adicional: 0,
+  },
+];
+
+export const coloresPlacas: ColorPlaca[] = [
+  {
+    id: 'color1',
+    nombre: 'Plateado',
+    codigo_hex: '#C0C0C0',
+    precio_adicional: 0,
+  },
+  {
+    id: 'color2',
+    nombre: 'Dorado',
+    codigo_hex: '#FFD700',
+    precio_adicional: 0,
+  },
+  {
+    id: 'color3',
+    nombre: 'Negro',
+    codigo_hex: '#000000',
+    precio_adicional: 0,
+  },
+  {
+    id: 'color4',
+    nombre: 'Azul',
+    codigo_hex: '#4169E1',
+    precio_adicional: 0,
+  },
+  {
+    id: 'color5',
+    nombre: 'Rojo',
+    codigo_hex: '#DC143C',
+    precio_adicional: 0,
+  },
+];
+
+export const tipografiasPlacas: TipografiaPlaca[] = [
+  {
+    id: 'tipo1',
+    nombre: 'Clásica',
+    font_family: 'serif',
+    precio_adicional: 0,
+  },
+  {
+    id: 'tipo2',
+    nombre: 'Moderna',
+    font_family: 'sans-serif',
+    precio_adicional: 0,
+  },
+  {
+    id: 'tipo3',
+    nombre: 'Cursiva',
+    font_family: 'cursive',
+    precio_adicional: 0,
+  },
+  {
+    id: 'tipo4',
+    nombre: 'Retro',
+    font_family: 'monospace',
+    precio_adicional: 0,
+  },
+];
+
+export const iconosPlacas: IconoPlaca[] = [
+  {
+    id: 'icono1',
+    nombre: 'Huella',
+    categoria: 'mascotas',
+    codigo_icon: 'faPaw',
+    precio_adicional: 0,
+  },
+  {
+    id: 'icono2',
+    nombre: 'Corazón',
+    categoria: 'amor',
+    codigo_icon: 'faHeart',
+    precio_adicional: 0,
+  },
+  {
+    id: 'icono3',
+    nombre: 'Estrella',
+    categoria: 'especial',
+    codigo_icon: 'faStar',
+    precio_adicional: 0,
+  },
+  {
+    id: 'icono4',
+    nombre: 'Perro',
+    categoria: 'mascotas',
+    codigo_icon: 'faDog',
+    precio_adicional: 0,
+  },
+  {
+    id: 'icono5',
+    nombre: 'Gato',
+    categoria: 'mascotas',
+    codigo_icon: 'faCat',
+    precio_adicional: 0,
+  },
+  {
+    id: 'icono6',
+    nombre: 'Casa',
+    categoria: 'hogar',
+    codigo_icon: 'faHome',
+    precio_adicional: 0,
+  },
 ]; 
