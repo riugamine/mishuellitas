@@ -62,7 +62,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     forma_id: '',
     color_id: '',
     tipografia_id: '',
-    icono_id: '',
+    icono_id: 'none',
   });
   const [placaPreview, setPlacaPreview] = useState({
     precioTotal: 0,
@@ -74,15 +74,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
   // Funciones auxiliares para placas
   const getIconComponent = (iconCode: string) => {
-    const iconMap: any = {
-      'faPaw': faPaw,
-      'faHeart': faHeart,
-      'faStar': faStar,
-      'faDog': faDog,
-      'faCat': faCat,
-      'faHome': faHome,
-    };
-    return iconMap[iconCode] || faPaw;
+    // Ahora iconCode es la ruta de la imagen
+    return iconCode;
   };
 
   const calculatePlacaPrice = () => {
@@ -117,6 +110,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               forma_id: formasPlacas[0]?.id || '',
               color_id: coloresPlacas[0]?.id || '',
               tipografia_id: tipografiasPlacas[0]?.id || '',
+              icono_id: 'none',
             }));
           }
         }
@@ -596,98 +590,119 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 {/* Tipografía */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium text-gray-700">Tipografía:</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {tipografiasPlacas.map((tipografia) => (
-                      <button
-                        key={tipografia.id}
-                        type="button"
-                        onClick={() => updatePlacaPersonalization('tipografia_id', tipografia.id)}
-                        className={`p-3 border rounded-lg text-center transition-all ${
-                          placaPersonalization.tipografia_id === tipografia.id
-                            ? 'border-blue-500 bg-blue-100'
-                            : 'border-gray-300 hover:border-gray-400'
-                        }`}
-                      >
-                        <div 
-                          className="font-medium mb-1"
-                          style={{ fontFamily: tipografia.font_family }}
-                        >
-                          {tipografia.nombre}
-                        </div>
-                        <div 
-                          className="text-sm text-gray-600"
-                          style={{ fontFamily: tipografia.font_family }}
-                        >
-                          {placaPersonalization.nombre_mascota || 'Ejemplo'}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                  <Select 
+                    value={placaPersonalization.tipografia_id} 
+                    onValueChange={(value) => updatePlacaPersonalization('tipografia_id', value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona una tipografía" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {tipografiasPlacas.map((tipografia) => (
+                        <SelectItem key={tipografia.id} value={tipografia.id}>
+                          <div className="flex flex-col gap-1 py-1">
+                            <div 
+                              className="font-medium text-base"
+                              style={{ fontFamily: tipografia.font_family }}
+                            >
+                              {tipografia.nombre}
+                            </div>
+                            <div 
+                              className="text-sm text-gray-600"
+                              style={{ fontFamily: tipografia.font_family }}
+                            >
+                              {placaPersonalization.nombre_mascota || 'Vista previa'}
+                            </div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Icono opcional */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium text-gray-700">Icono (opcional):</Label>
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                    <button
-                      key="sin-icono"
-                      type="button"
-                      onClick={() => updatePlacaPersonalization('icono_id', '')}
-                      className={`p-3 border rounded-lg text-center transition-all ${
-                        !placaPersonalization.icono_id
-                          ? 'border-blue-500 bg-blue-100'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      <div className="text-xs font-medium">Sin icono</div>
-                    </button>
-                    {iconosPlacas.map((icono) => (
-                      <button
-                        key={icono.id}
-                        type="button"
-                        onClick={() => updatePlacaPersonalization('icono_id', icono.id)}
-                        className={`p-3 border rounded-lg text-center transition-all ${
-                          placaPersonalization.icono_id === icono.id
-                            ? 'border-blue-500 bg-blue-100'
-                            : 'border-gray-300 hover:border-gray-400'
-                        }`}
-                      >
-                        <FontAwesomeIcon 
-                          icon={getIconComponent(icono.codigo_icon)} 
-                          className="text-lg mb-1"
-                        />
-                        <div className="text-xs font-medium">{icono.nombre}</div>
-                      </button>
-                    ))}
-                  </div>
+                  <Select 
+                    value={placaPersonalization.icono_id} 
+                    onValueChange={(value) => updatePlacaPersonalization('icono_id', value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona un icono" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      <SelectItem value="none">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 flex items-center justify-center border rounded">
+                            <span className="text-xs">--</span>
+                          </div>
+                          <span>Sin icono</span>
+                        </div>
+                      </SelectItem>
+                      {iconosPlacas.map((icono) => (
+                        <SelectItem key={icono.id} value={icono.id}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 flex items-center justify-center">
+                              <img 
+                                src={icono.codigo_icon} 
+                                alt={icono.nombre}
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                            <span>{icono.nombre}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Vista previa */}
-                <div className="p-4 bg-white rounded-lg border-2 border-dashed border-gray-300">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2 text-center">Vista previa:</h4>
+                <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                  <h4 className="text-lg font-semibold text-gray-700 mb-4 text-center">🏷️ Vista previa de tu placa</h4>
                   <div className="flex items-center justify-center">
                     <div 
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2"
+                      className="inline-flex items-center gap-3 px-6 py-3 rounded-xl border-2 shadow-lg"
                       style={{ 
                         backgroundColor: coloresPlacas.find(c => c.id === placaPersonalization.color_id)?.codigo_hex || '#C0C0C0',
                         color: placaPersonalization.color_id === 'color3' ? 'white' : 'black',
-                        fontFamily: tipografiasPlacas.find(t => t.id === placaPersonalization.tipografia_id)?.font_family || 'sans-serif'
+                        fontFamily: tipografiasPlacas.find(t => t.id === placaPersonalization.tipografia_id)?.font_family || 'sans-serif',
+                        fontSize: '18px'
                       }}
                     >
-                      {placaPersonalization.icono_id && (
-                        <FontAwesomeIcon 
-                          icon={getIconComponent(iconosPlacas.find(i => i.id === placaPersonalization.icono_id)?.codigo_icon || 'faPaw')} 
-                          className="text-sm"
-                        />
+                      {placaPersonalization.icono_id && placaPersonalization.icono_id !== 'none' && (
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          <img 
+                            src={iconosPlacas.find(i => i.id === placaPersonalization.icono_id)?.codigo_icon || '/placas/iconos/huella.png'} 
+                            alt="Icono seleccionado"
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
                       )}
                       <span className="font-bold">
                         {placaPersonalization.nombre_mascota || 'Tu Mascota'}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    Precio total: REF {placaPreview.precioTotal.toFixed(2)}
-                  </p>
+                  <div className="mt-4 text-center space-y-1">
+                    <p className="text-sm text-gray-600">
+                      Forma: <span className="font-medium">{formasPlacas.find(f => f.id === placaPersonalization.forma_id)?.nombre || 'Redonda'}</span>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Color: <span className="font-medium">{coloresPlacas.find(c => c.id === placaPersonalization.color_id)?.nombre || 'Plateado'}</span>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Tipografía: <span className="font-medium">{tipografiasPlacas.find(t => t.id === placaPersonalization.tipografia_id)?.nombre || 'Archivo Black'}</span>
+                    </p>
+                    {placaPersonalization.icono_id && placaPersonalization.icono_id !== 'none' && (
+                      <p className="text-sm text-gray-600">
+                        Icono: <span className="font-medium">{iconosPlacas.find(i => i.id === placaPersonalization.icono_id)?.nombre}</span>
+                      </p>
+                    )}
+                    <p className="text-base font-bold text-primary mt-2">
+                      Precio total: REF {placaPreview.precioTotal.toFixed(2)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </Card>

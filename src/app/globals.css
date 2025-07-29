@@ -445,3 +445,102 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Fuentes para placas personalizadas */
+@font-face {
+  font-family: 'ArchivoBlack';
+  src: url('/placas/tipografias/ArchivoBlack-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'BestCurry';
+  src: url('/placas/tipografias/Best Curry.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bestime';
+  src: url('/placas/tipografias/Bestime.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CallingHeart';
+  src: url('/placas/tipografias/Calling Heart.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CHERI';
+  src: url('/placas/tipografias/CHERI.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ChocoShake';
+  src: url('/placas/tipografias/Choco Shake.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CreamCakeBold';
+  src: url('/placas/tipografias/Cream Cake Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Dinosaur';
+  src: url('/placas/tipografias/Dinosaur.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GosentBlack';
+  src: url('/placas/tipografias/GosentDEMO-Black.otf') format('opentype');
+  font-weight: black;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HappySelfie';
+  src: url('/placas/tipografias/Happy Selfie.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HelloValentina';
+  src: url('/placas/tipografias/Hello Valentina.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'LearnThing';
+  src: url('/placas/tipografias/Learn Thing.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MilkPeachClean';
+  src: url('/placas/tipografias/Milk Peach Clean.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Showdex';
+  src: url('/placas/tipografias/Showdex.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
