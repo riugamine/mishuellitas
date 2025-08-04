@@ -42,6 +42,7 @@ export type FormaPlaca = {
   nombre: string;
   descripcion: string;
   precio_adicional: number;
+  max_characters: number; // Máximo de caracteres permitidos para esta forma
 };
 
 export type ColorPlaca = {
@@ -49,6 +50,7 @@ export type ColorPlaca = {
   nombre: string;
   codigo_hex: string;
   precio_adicional: number;
+  restricciones?: string[]; // IDs de formas que NO pueden usar este color
 };
 
 export type TipografiaPlaca = {
@@ -338,70 +340,95 @@ export const variantesProductos: VarianteProducto[] = [
   { id: 'v14', product_id: 'p8', talla: 'Estándar', stock: 50 },
 ];
 
-// Configuración para placas personalizadas
+// Configuración para placas personalizadas - Actualizado según especificaciones de la clienta
 export const formasPlacas: FormaPlaca[] = [
   {
-    id: 'forma1',
-    nombre: 'Redonda',
-    descripcion: 'Placa circular clásica',
+    id: 'forma_huesito_grande',
+    nombre: 'Huesito Grande',
+    descripcion: 'Forma de hueso grande',
     precio_adicional: 0,
+    max_characters: 10,
   },
   {
-    id: 'forma2',
-    nombre: 'Rectangular',
-    descripcion: 'Placa rectangular tradicional',
+    id: 'forma_huesito_pequeno',
+    nombre: 'Huesito Pequeño',
+    descripcion: 'Forma de hueso pequeño',
     precio_adicional: 0,
+    max_characters: 8,
   },
   {
-    id: 'forma3',
-    nombre: 'Hueso',
-    descripcion: 'Forma de hueso divertida',
-    precio_adicional: 0,
-  },
-  {
-    id: 'forma4',
+    id: 'forma_corazon',
     nombre: 'Corazón',
     descripcion: 'Forma de corazón adorable',
     precio_adicional: 0,
+    max_characters: 8,
   },
   {
-    id: 'forma5',
+    id: 'forma_estrella',
     nombre: 'Estrella',
     descripcion: 'Forma de estrella única',
     precio_adicional: 0,
+    max_characters: 8,
+  },
+  {
+    id: 'forma_huellita',
+    nombre: 'Huellita',
+    descripcion: 'Forma de huella de mascota',
+    precio_adicional: 0,
+    max_characters: 8,
+  },
+  {
+    id: 'forma_circulo',
+    nombre: 'Círculo',
+    descripcion: 'Forma circular clásica',
+    precio_adicional: 0,
+    max_characters: 10,
   },
 ];
 
 export const coloresPlacas: ColorPlaca[] = [
   {
-    id: 'color1',
-    nombre: 'Plateado',
-    codigo_hex: '#C0C0C0',
+    id: 'color_azul_rey',
+    nombre: 'Azul Rey',
+    codigo_hex: '#4169E1',
     precio_adicional: 0,
   },
   {
-    id: 'color2',
-    nombre: 'Dorado',
-    codigo_hex: '#FFD700',
+    id: 'color_morado',
+    nombre: 'Morado',
+    codigo_hex: '#800080',
     precio_adicional: 0,
   },
   {
-    id: 'color3',
+    id: 'color_rosado',
+    nombre: 'Rosado',
+    codigo_hex: '#FFB6C1',
+    precio_adicional: 0,
+  },
+  {
+    id: 'color_verde',
+    nombre: 'Verde',
+    codigo_hex: '#228B22',
+    precio_adicional: 0,
+  },
+  {
+    id: 'color_negro',
     nombre: 'Negro',
     codigo_hex: '#000000',
     precio_adicional: 0,
   },
   {
-    id: 'color4',
-    nombre: 'Azul',
-    codigo_hex: '#4169E1',
-    precio_adicional: 0,
-  },
-  {
-    id: 'color5',
+    id: 'color_rojo',
     nombre: 'Rojo',
     codigo_hex: '#DC143C',
     precio_adicional: 0,
+  },
+  {
+    id: 'color_turquesa',
+    nombre: 'Turquesa',
+    codigo_hex: '#40E0D0',
+    precio_adicional: 0,
+    restricciones: ['forma_huellita', 'forma_huesito_grande'], // No disponible para huellita y huesito grande
   },
 ];
 

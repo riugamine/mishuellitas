@@ -83,11 +83,48 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     return product?.precio || 0;
   };
 
+  // Obtener forma seleccionada y sus restricciones
+  const selectedForma = React.useMemo(() => {
+    return formasPlacas.find(f => f.id === placaPersonalization.forma_id);
+  }, [placaPersonalization.forma_id]);
+
+  // Filtrar colores disponibles según la forma seleccionada
+  const coloresDisponibles = React.useMemo(() => {
+    if (!selectedForma) return coloresPlacas;
+    return coloresPlacas.filter(color => {
+      // Si el color tiene restricciones, verificar si la forma actual está en ellas
+      if (color.restricciones && color.restricciones.includes(selectedForma.id)) {
+        return false;
+      }
+      return true;
+    });
+  }, [selectedForma]);
+
   const updatePlacaPersonalization = (field: keyof PersonalizacionPlaca, value: string) => {
-    setPlacaPersonalization(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setPlacaPersonalization(prev => {
+      const newState = {
+        ...prev,
+        [field]: value
+      };
+      
+      // Si se cambió la forma, verificar si el color actual está disponible
+      if (field === 'forma_id') {
+        const newForma = formasPlacas.find(f => f.id === value);
+        const colorActual = coloresPlacas.find(c => c.id === prev.color_id);
+        
+        // Si el color actual tiene restricciones para la nueva forma, resetear color
+        if (colorActual?.restricciones && colorActual.restricciones.includes(value)) {
+          newState.color_id = coloresPlacas.find(c => !c.restricciones?.includes(value))?.id || '';
+        }
+        
+        // Si el nombre excede el límite de la nueva forma, truncarlo
+        if (newForma && prev.nombre_mascota.length > newForma.max_characters) {
+          newState.nombre_mascota = prev.nombre_mascota.slice(0, newForma.max_characters);
+        }
+      }
+      
+      return newState;
+    });
   };
   
   // Resolve async params and set product data
@@ -160,6 +197,20 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       }
       if (!placaPersonalization.forma_id || !placaPersonalization.color_id || !placaPersonalization.tipografia_id) {
         toast.error('🐾 Por favor completa todas las opciones de personalización');
+        return;
+      }
+      
+      // Validar longitud del nombre según la forma
+      const forma = formasPlacas.find(f => f.id === placaPersonalization.forma_id);
+      if (forma && placaPersonalization.nombre_mascota.length > forma.max_characters) {
+        toast.error(`🐾 El nombre no puede tener más de ${forma.max_characters} caracteres para la forma ${forma.nombre}`);
+        return;
+      }
+      
+      // Validar que el color esté disponible para la forma
+      const color = coloresPlacas.find(c => c.id === placaPersonalization.color_id);
+      if (color?.restricciones && color.restricciones.includes(placaPersonalization.forma_id)) {
+        toast.error(`🐾 El color ${color.nombre} no está disponible para la forma ${forma?.nombre}`);
         return;
       }
     }
@@ -243,6 +294,20 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
       }
       if (!placaPersonalization.forma_id || !placaPersonalization.color_id || !placaPersonalization.tipografia_id) {
         toast.error('🐾 Por favor completa todas las opciones de personalización');
+        return;
+      }
+      
+      // Validar longitud del nombre según la forma
+      const forma = formasPlacas.find(f => f.id === placaPersonalization.forma_id);
+      if (forma && placaPersonalization.nombre_mascota.length > forma.max_characters) {
+        toast.error(`🐾 El nombre no puede tener más de ${forma.max_characters} caracteres para la forma ${forma.nombre}`);
+        return;
+      }
+      
+      // Validar que el color esté disponible para la forma
+      const color = coloresPlacas.find(c => c.id === placaPersonalization.color_id);
+      if (color?.restricciones && color.restricciones.includes(placaPersonalization.forma_id)) {
+        toast.error(`🐾 El color ${color.nombre} no está disponible para la forma ${forma?.nombre}`);
         return;
       }
     }
@@ -513,7 +578,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
           {/* Personalización de Placas */}
           {product.tipo === 'placa' && (
-            <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200">
+            <Card className="p-6  border-2 border-blue-200">
               <h3 className="text-xl font-semibold mb-4 text-center text-blue-800">
                 🏷️ Personaliza tu Placa
               </h3>
@@ -521,26 +586,32 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               <div className="space-y-6">
                 {/* Nombre de la mascota */}
                 <div className="space-y-2">
-                  <Label htmlFor="nombreMascota" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="nombreMascota" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nombre de tu mascota *
                   </Label>
                   <Input
                     id="nombreMascota"
                     type="text"
                     value={placaPersonalization.nombre_mascota}
-                    onChange={(e) => updatePlacaPersonalization('nombre_mascota', e.target.value)}
+                    onChange={(e) => {
+                      const maxLength = selectedForma?.max_characters || 20;
+                      if (e.target.value.length <= maxLength) {
+                        updatePlacaPersonalization('nombre_mascota', e.target.value);
+                      }
+                    }}
                     placeholder="Ej: Max, Luna, Rocky..."
-                    maxLength={20}
+                    maxLength={selectedForma?.max_characters || 20}
                     className="text-center font-bold"
                   />
-                  <p className="text-xs text-gray-500 text-center">
-                    Máximo 20 caracteres
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    Máximo {selectedForma?.max_characters || 20} caracteres
+                    {selectedForma && ` (${selectedForma.nombre})`}
                   </p>
                 </div>
 
                 {/* Forma de la placa */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-gray-700">Forma de la placa:</Label>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Forma de la placa:</Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {formasPlacas.map((forma) => (
                       <button
@@ -553,8 +624,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                             : 'border-gray-300 hover:border-gray-400'
                         }`}
                       >
-                        <div className="font-medium">{forma.nombre}</div>
-                        <div className="text-xs text-gray-600">{forma.descripcion}</div>
+                        <div className="font-medium dark:text-gray-200">{forma.nombre}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">{forma.descripcion}</div>
                       </button>
                     ))}
                   </div>
@@ -562,9 +633,9 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
                 {/* Color de la placa */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-gray-700">Color de la placa:</Label>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Color de la placa:</Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {coloresPlacas.map((color) => (
+                    {coloresDisponibles.map((color) => (
                       <button
                         key={color.id}
                         type="button"
@@ -585,11 +656,16 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                       </button>
                     ))}
                   </div>
+                  {selectedForma && coloresPlacas.length > coloresDisponibles.length && (
+                    <p className="text-xs text-orange-600 dark:text-orange-400 text-center">
+                      * Algunos colores no están disponibles para la forma {selectedForma.nombre}
+                    </p>
+                  )}
                 </div>
 
                 {/* Tipografía */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-gray-700">Tipografía:</Label>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipografía:</Label>
                   <Select 
                     value={placaPersonalization.tipografia_id} 
                     onValueChange={(value) => updatePlacaPersonalization('tipografia_id', value)}
@@ -597,32 +673,53 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Selecciona una tipografía" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-60">
+                    <SelectContent className="max-h-80 w-full">
                       {tipografiasPlacas.map((tipografia) => (
-                        <SelectItem key={tipografia.id} value={tipografia.id}>
-                          <div className="flex flex-col gap-1 py-1">
-                            <div 
-                              className="font-medium text-base"
-                              style={{ fontFamily: tipografia.font_family }}
-                            >
-                              {tipografia.nombre}
+                        <SelectItem 
+                          key={tipografia.id} 
+                          value={tipografia.id}
+                          className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100 dark:focus:bg-gray-800"
+                        >
+                          <div className="flex items-center justify-between w-full min-w-0 gap-4 py-2">
+                            {/* Nombre de la tipografía */}
+                            <div className="flex-shrink-0">
+                              <div 
+                                className="font-medium text-sm text-gray-900 dark:text-gray-100"
+                                style={{ fontFamily: tipografia.font_family }}
+                              >
+                                {tipografia.nombre}
+                              </div>
                             </div>
-                            <div 
-                              className="text-sm text-gray-600"
-                              style={{ fontFamily: tipografia.font_family }}
-                            >
-                              {placaPersonalization.nombre_mascota || 'Vista previa'}
+                            
+                            {/* Separador visual */}
+                            <div className="flex-grow border-t border-dotted border-gray-300 dark:border-gray-600 mx-2"></div>
+                            
+                            {/* Vista previa con el nombre de la mascota */}
+                            <div className="flex-shrink-0 max-w-[120px]">
+                              <div 
+                                className="text-sm font-bold text-gray-700 dark:text-gray-300 truncate text-right"
+                                style={{ 
+                                  fontFamily: tipografia.font_family,
+                                  fontSize: '16px'
+                                }}
+                                title={placaPersonalization.nombre_mascota || 'Vista previa'}
+                              >
+                                {placaPersonalization.nombre_mascota || 'Vista previa'}
+                              </div>
                             </div>
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    💡 La vista previa muestra cómo se verá "{placaPersonalization.nombre_mascota || 'el nombre'}" en cada tipografía
+                  </div>
                 </div>
 
                 {/* Icono opcional */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-gray-700">Icono (opcional):</Label>
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Icono (opcional):</Label>
                   <Select 
                     value={placaPersonalization.icono_id} 
                     onValueChange={(value) => updatePlacaPersonalization('icono_id', value)}
@@ -658,14 +755,14 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 </div>
 
                 {/* Vista previa */}
-                <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-                  <h4 className="text-lg font-semibold text-gray-700 mb-4 text-center">🏷️ Vista previa de tu placa</h4>
+                <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+                  <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center">🏷️ Vista previa de tu placa</h4>
                   <div className="flex items-center justify-center">
                     <div 
                       className="inline-flex items-center gap-3 px-6 py-3 rounded-xl border-2 shadow-lg"
                       style={{ 
                         backgroundColor: coloresPlacas.find(c => c.id === placaPersonalization.color_id)?.codigo_hex || '#C0C0C0',
-                        color: placaPersonalization.color_id === 'color3' ? 'white' : 'black',
+                        color: placaPersonalization.color_id === 'color_negro' ? 'white' : 'black',
                         fontFamily: tipografiasPlacas.find(t => t.id === placaPersonalization.tipografia_id)?.font_family || 'sans-serif',
                         fontSize: '18px'
                       }}
@@ -685,21 +782,21 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                     </div>
                   </div>
                   <div className="mt-4 text-center space-y-1">
-                    <p className="text-sm text-gray-600">
-                      Forma: <span className="font-medium">{formasPlacas.find(f => f.id === placaPersonalization.forma_id)?.nombre || 'Redonda'}</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Forma: <span className="font-medium text-gray-800 dark:text-gray-200">{formasPlacas.find(f => f.id === placaPersonalization.forma_id)?.nombre || 'Círculo'}</span>
                     </p>
-                    <p className="text-sm text-gray-600">
-                      Color: <span className="font-medium">{coloresPlacas.find(c => c.id === placaPersonalization.color_id)?.nombre || 'Plateado'}</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Color: <span className="font-medium text-gray-800 dark:text-gray-200">{coloresPlacas.find(c => c.id === placaPersonalization.color_id)?.nombre || 'Azul Rey'}</span>
                     </p>
-                    <p className="text-sm text-gray-600">
-                      Tipografía: <span className="font-medium">{tipografiasPlacas.find(t => t.id === placaPersonalization.tipografia_id)?.nombre || 'Archivo Black'}</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Tipografía: <span className="font-medium text-gray-800 dark:text-gray-200">{tipografiasPlacas.find(t => t.id === placaPersonalization.tipografia_id)?.nombre || 'Archivo Black'}</span>
                     </p>
                     {placaPersonalization.icono_id && placaPersonalization.icono_id !== 'none' && (
-                      <p className="text-sm text-gray-600">
-                        Icono: <span className="font-medium">{iconosPlacas.find(i => i.id === placaPersonalization.icono_id)?.nombre}</span>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Icono: <span className="font-medium text-gray-800 dark:text-gray-200">{iconosPlacas.find(i => i.id === placaPersonalization.icono_id)?.nombre}</span>
                       </p>
                     )}
-                    <p className="text-base font-bold text-primary mt-2">
+                    <p className="text-base font-bold text-primary dark:text-primary-foreground mt-2">
                       Precio total: REF {placaPreview.precioTotal.toFixed(2)}
                     </p>
                   </div>

@@ -54,7 +54,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="w-full py-4 px-6 md:px-10 flex items-center justify-between bg-background/95 backdrop-blur-md sticky top-0 z-50 border-b border-border shadow-sm transition-colors">
+    <header className=" w-full py-4 px-6 md:px-10 flex items-center justify-between sticky top-0 z-50 border-b border-border">
       
       {/* Logo */}
       <div className="flex items-center relative z-10">
@@ -256,7 +256,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border shadow-lg z-40 animate-slide-in-left">
+        <div className="md:hidden absolute top-full left-0 right-0 border-b border-border shadow-lg z-40 animate-slide-in-left bg-white dark:bg-background">
           <nav className="flex flex-col py-4">
             {/* Mobile Search */}
             <div className="px-6 py-3">
