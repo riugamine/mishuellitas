@@ -305,19 +305,6 @@ export default function CartPage() {
                 <ScrollBar orientation="vertical" />
               </ScrollArea>
               
-              {/* Order Notes */}
-              <div className="mt-6 pt-6 border-t">
-                <Label htmlFor="order-notes" className="text-base font-medium">
-                  Notas del pedido (opcional)
-                </Label>
-                <Input
-                  id="order-notes"
-                  placeholder="Agregar instrucciones especiales para tu pedido..."
-                  value={orderNotes}
-                  onChange={(e) => setOrderNotes(e.target.value)}
-                  className="mt-2"
-                />
-              </div>
             </Card>
           </div>
           

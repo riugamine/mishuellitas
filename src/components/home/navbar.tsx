@@ -254,7 +254,7 @@ export function Navbar() {
         </Button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu */} 
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 border-b border-border shadow-lg z-40 animate-slide-in-left bg-white dark:bg-background">
           <nav className="flex flex-col py-4">
