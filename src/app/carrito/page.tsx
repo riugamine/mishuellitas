@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { useCartStore } from '@/lib/store/useCartStore';
@@ -16,7 +15,7 @@ import { toast } from 'sonner';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default function CartPage() {
-  const { items, totalItems, orderNotes, updateQuantity, removeItem, setOrderNotes, clearCart } = useCartStore();
+  const { items, totalItems, updateQuantity, removeItem, clearCart } = useCartStore();
 
   // Calcular totales
   const subtotal = useMemo(() => {

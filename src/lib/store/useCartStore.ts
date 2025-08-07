@@ -27,11 +27,9 @@ interface CartItem {
 interface CartStore {
   items: CartItem[];
   totalItems: number;
-  orderNotes: string;
   addItem: (item: CartItem) => void;
   removeItem: (variant_id: string) => void;
   updateQuantity: (variant_id: string, quantity: number) => void;
-  setOrderNotes: (notes: string) => void;
   clearCart: () => void;
 }
 
@@ -40,7 +38,6 @@ export const useCartStore = create<CartStore>()(
     (set) => ({
       items: [],
       totalItems: 0,
-      orderNotes: '',
       addItem: (item) =>
         set((state) => {
           const existingItem = state.items.find(
@@ -97,8 +94,8 @@ export const useCartStore = create<CartStore>()(
               state.totalItems - item.quantity + newQuantity,
           };
         }),
-      setOrderNotes: (notes) => set((state) => ({ ...state, orderNotes: notes })),
-      clearCart: () => set({ items: [], totalItems: 0, orderNotes: '' }),
+
+      clearCart: () => set({ items: [], totalItems: 0 }),
     }),
     {
       name: 'cart-storage',
