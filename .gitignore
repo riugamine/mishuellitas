@@ -42,3 +42,6 @@ next-env.d.ts
 
 # worker
 .open-next
+#Database
+supabase-data-inserts.sql
+supabase-schema-complete.sql

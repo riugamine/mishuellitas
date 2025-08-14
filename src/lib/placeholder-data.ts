@@ -69,11 +69,98 @@ export type IconoPlaca = {
 };
 
 export type PersonalizacionPlaca = {
+  id?: string;
   nombre_mascota: string;
   forma_id: string;
   color_id: string;
   tipografia_id: string;
   icono_id?: string;
+  created_at?: string;
+};
+
+// Tipos para el sistema de usuarios y autenticación
+export type PerfilUsuario = {
+  id: string;
+  email: string;
+  nombre_completo: string;
+  rol: 'admin' | 'super_admin';
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+// Tipos para el sistema de órdenes
+export type EstadoOrden = 'pendiente' | 'contactado' | 'confirmado' | 'preparando' | 'enviado' | 'entregado' | 'cancelado';
+export type MetodoContacto = 'whatsapp' | 'telefono' | 'email';
+
+export type Orden = {
+  id: string;
+  numero_orden: string;
+  
+  // Datos del cliente
+  cliente_nombre: string;
+  cliente_telefono: string;
+  cliente_email?: string;
+  cliente_direccion?: string;
+  cliente_ciudad?: string;
+  cliente_codigo_postal?: string;
+  
+  // Datos de la orden
+  subtotal: number;
+  impuestos: number;
+  envio: number;
+  total: number;
+  
+  // Estado y seguimiento
+  estado: EstadoOrden;
+  metodo_contacto: MetodoContacto;
+  
+  // Notas
+  notas_cliente?: string;
+  notas_admin?: string;
+  
+  // Timestamps
+  created_at: string;
+  updated_at: string;
+  contactado_at?: string;
+  confirmado_at?: string;
+  enviado_at?: string;
+  entregado_at?: string;
+};
+
+export type OrdenItem = {
+  id: string;
+  orden_id: string;
+  producto_id: string;
+  variante_id?: string;
+  personalizacion_id?: string;
+  
+  cantidad: number;
+  precio_unitario: number;
+  precio_total: number;
+  
+  // Snapshot de datos
+  producto_nombre: string;
+  producto_descripcion?: string;
+  variante_talla?: string;
+  
+  created_at: string;
+};
+
+export type OrdenHistorial = {
+  id: string;
+  orden_id: string;
+  estado_anterior?: EstadoOrden;
+  estado_nuevo: EstadoOrden;
+  comentario?: string;
+  usuario_admin_id?: string;
+  created_at: string;
+};
+
+export type RestriccionColorForma = {
+  id: string;
+  color_id: string;
+  forma_id: string;
 };
 
 // Categorías de ejemplo
@@ -780,5 +867,332 @@ export const iconosPlacas: IconoPlaca[] = [
     categoria: 'especial',
     codigo_icon: '/placas/iconos/iconos (26).png',
     precio_adicional: 0,
+  },
+];
+
+// Mock data para el sistema de usuarios administradores
+export const perfilesUsuario: PerfilUsuario[] = [
+  {
+    id: 'admin-1',
+    email: 'admin@mishuellitas.com',
+    nombre_completo: 'Administrador Principal',
+    rol: 'super_admin',
+    is_active: true,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+  },
+  {
+    id: 'admin-2',
+    email: 'manager@mishuellitas.com',
+    nombre_completo: 'Manager de Tienda',
+    rol: 'admin',
+    is_active: true,
+    created_at: '2024-01-20T14:30:00Z',
+    updated_at: '2024-01-20T14:30:00Z',
+  },
+];
+
+// Mock data para restricciones de colores y formas
+export const restriccionesColoresFormas: RestriccionColorForma[] = [
+  {
+    id: 'rest-1',
+    color_id: 'color_turquesa',
+    forma_id: 'forma_huellita',
+  },
+  {
+    id: 'rest-2',
+    color_id: 'color_turquesa',
+    forma_id: 'forma_huesito_grande',
+  },
+];
+
+// Mock data para personalizaciones de placas
+export const personalizacionesPlacas: PersonalizacionPlaca[] = [
+  {
+    id: 'pers-1',
+    nombre_mascota: 'Max',
+    forma_id: 'forma_huesito_grande',
+    color_id: 'color_azul_rey',
+    tipografia_id: 'tipo1',
+    icono_id: 'icono11',
+    created_at: '2024-01-25T09:15:00Z',
+  },
+  {
+    id: 'pers-2',
+    nombre_mascota: 'Luna',
+    forma_id: 'forma_corazon',
+    color_id: 'color_rosado',
+    tipografia_id: 'tipo4',
+    icono_id: 'icono18',
+    created_at: '2024-01-25T11:30:00Z',
+  },
+  {
+    id: 'pers-3',
+    nombre_mascota: 'Rocky',
+    forma_id: 'forma_estrella',
+    color_id: 'color_negro',
+    tipografia_id: 'tipo8',
+    icono_id: 'icono19',
+    created_at: '2024-01-25T14:45:00Z',
+  },
+];
+
+// Mock data para órdenes
+export const ordenes: Orden[] = [
+  {
+    id: 'orden-1',
+    numero_orden: 'ORD-2024-0001',
+    cliente_nombre: 'María García',
+    cliente_telefono: '+52 999 123 4567',
+    cliente_email: 'maria.garcia@email.com',
+    cliente_direccion: 'Calle 45 #123 x 20 y 22, Col. Centro',
+    cliente_ciudad: 'Mérida',
+    cliente_codigo_postal: '97000',
+    subtotal: 275.00,
+    impuestos: 0,
+    envio: 50.00,
+    total: 325.00,
+    estado: 'confirmado',
+    metodo_contacto: 'whatsapp',
+    notas_cliente: 'Favor de llamar antes de entregar',
+    notas_admin: 'Cliente prefiere entrega en la tarde',
+    created_at: '2024-01-25T08:30:00Z',
+    updated_at: '2024-01-25T10:15:00Z',
+    contactado_at: '2024-01-25T09:00:00Z',
+    confirmado_at: '2024-01-25T10:15:00Z',
+  },
+  {
+    id: 'orden-2',
+    numero_orden: 'ORD-2024-0002',
+    cliente_nombre: 'Carlos Pérez',
+    cliente_telefono: '+52 999 987 6543',
+    cliente_email: 'carlos.perez@email.com',
+    cliente_direccion: 'Av. Itzáes #456, Col. García Ginerés',
+    cliente_ciudad: 'Mérida',
+    cliente_codigo_postal: '97070',
+    subtotal: 120.00,
+    impuestos: 0,
+    envio: 0, // Recogerá en tienda
+    total: 120.00,
+    estado: 'preparando',
+    metodo_contacto: 'whatsapp',
+    notas_cliente: 'Recogeré en tienda el sábado',
+    created_at: '2024-01-25T14:20:00Z',
+    updated_at: '2024-01-25T15:45:00Z',
+    contactado_at: '2024-01-25T14:30:00Z',
+    confirmado_at: '2024-01-25T15:45:00Z',
+  },
+  {
+    id: 'orden-3',
+    numero_orden: 'ORD-2024-0003',
+    cliente_nombre: 'Ana Rodríguez',
+    cliente_telefono: '+52 999 555 7890',
+    cliente_direccion: 'Calle 60 #789, Col. Centro Histórico',
+    cliente_ciudad: 'Mérida',
+    cliente_codigo_postal: '97000',
+    subtotal: 45.00,
+    impuestos: 0,
+    envio: 30.00,
+    total: 75.00,
+    estado: 'pendiente',
+    metodo_contacto: 'whatsapp',
+    notas_cliente: 'Es para regalo, favor de envolver bonito',
+    created_at: '2024-01-26T11:10:00Z',
+    updated_at: '2024-01-26T11:10:00Z',
+  },
+  {
+    id: 'orden-4',
+    numero_orden: 'ORD-2024-0004',
+    cliente_nombre: 'Luis Hernández',
+    cliente_telefono: '+52 999 444 1122',
+    cliente_email: 'luis.hernandez@email.com',
+    cliente_direccion: 'Calle 23 #345, Col. Alemán',
+    cliente_ciudad: 'Mérida',
+    cliente_codigo_postal: '97204',
+    subtotal: 480.00,
+    impuestos: 0,
+    envio: 60.00,
+    total: 540.00,
+    estado: 'enviado',
+    metodo_contacto: 'telefono',
+    notas_admin: 'Envío con paquetería express',
+    created_at: '2024-01-24T16:45:00Z',
+    updated_at: '2024-01-25T08:00:00Z',
+    contactado_at: '2024-01-24T17:00:00Z',
+    confirmado_at: '2024-01-24T18:30:00Z',
+    enviado_at: '2024-01-25T08:00:00Z',
+  },
+];
+
+// Mock data para items de órdenes
+export const ordenItems: OrdenItem[] = [
+  // Orden 1 - María García
+  {
+    id: 'item-1',
+    orden_id: 'orden-1',
+    producto_id: 'p3',
+    variante_id: 'v6',
+    cantidad: 1,
+    precio_unitario: 250.00,
+    precio_total: 250.00,
+    producto_nombre: 'Sudadera de Tigre',
+    producto_descripcion: 'Sudadera cálida y cómoda con diseño de tigre para perros pequeños.',
+    variante_talla: 'M',
+    created_at: '2024-01-25T08:30:00Z',
+  },
+  {
+    id: 'item-2',
+    orden_id: 'orden-1',
+    producto_id: 'p7',
+    variante_id: 'v13',
+    personalizacion_id: 'pers-1',
+    cantidad: 1,
+    precio_unitario: 25.00,
+    precio_total: 25.00,
+    producto_nombre: 'Placa Personalizada Básica',
+    producto_descripcion: 'Placa personalizada para collar de mascota con grabado del nombre.',
+    variante_talla: 'Estándar',
+    created_at: '2024-01-25T08:30:00Z',
+  },
+  
+  // Orden 2 - Carlos Pérez
+  {
+    id: 'item-3',
+    orden_id: 'orden-2',
+    producto_id: 'p2',
+    variante_id: 'v3',
+    cantidad: 1,
+    precio_unitario: 120.00,
+    precio_total: 120.00,
+    producto_nombre: 'Alimento para Gatos Esterilizados',
+    producto_descripcion: 'Fórmula especial para gatos esterilizados, ayuda a mantener el peso ideal.',
+    variante_talla: '5kg',
+    created_at: '2024-01-25T14:20:00Z',
+  },
+  
+  // Orden 3 - Ana Rodríguez
+  {
+    id: 'item-4',
+    orden_id: 'orden-3',
+    producto_id: 'p5',
+    variante_id: 'v11',
+    cantidad: 1,
+    precio_unitario: 45.00,
+    precio_total: 45.00,
+    producto_nombre: 'Pelota Mordedora',
+    producto_descripcion: 'Pelota resistente para perros, ideal para juegos de buscar y traer.',
+    variante_talla: 'Única',
+    created_at: '2024-01-26T11:10:00Z',
+  },
+  
+  // Orden 4 - Luis Hernández
+  {
+    id: 'item-5',
+    orden_id: 'orden-4',
+    producto_id: 'p3',
+    variante_id: 'v7',
+    cantidad: 1,
+    precio_unitario: 250.00,
+    precio_total: 250.00,
+    producto_nombre: 'Sudadera de Tigre',
+    variante_talla: 'L',
+    created_at: '2024-01-24T16:45:00Z',
+  },
+  {
+    id: 'item-6',
+    orden_id: 'orden-4',
+    producto_id: 'p4',
+    variante_id: 'v10',
+    cantidad: 1,
+    precio_unitario: 230.00,
+    precio_total: 230.00,
+    producto_nombre: 'Sudadera de Dinosaurio',
+    variante_talla: 'L',
+    created_at: '2024-01-24T16:45:00Z',
+  },
+];
+
+// Mock data para historial de órdenes
+export const ordenHistorial: OrdenHistorial[] = [
+  {
+    id: 'hist-1',
+    orden_id: 'orden-1',
+    estado_anterior: 'pendiente',
+    estado_nuevo: 'contactado',
+    comentario: 'Cliente contactado vía WhatsApp',
+    usuario_admin_id: 'admin-1',
+    created_at: '2024-01-25T09:00:00Z',
+  },
+  {
+    id: 'hist-2',
+    orden_id: 'orden-1',
+    estado_anterior: 'contactado',
+    estado_nuevo: 'confirmado',
+    comentario: 'Orden confirmada, cliente acepta entrega',
+    usuario_admin_id: 'admin-1',
+    created_at: '2024-01-25T10:15:00Z',
+  },
+  {
+    id: 'hist-3',
+    orden_id: 'orden-2',
+    estado_anterior: 'pendiente',
+    estado_nuevo: 'contactado',
+    comentario: 'Cliente contactado, prefiere recoger en tienda',
+    usuario_admin_id: 'admin-2',
+    created_at: '2024-01-25T14:30:00Z',
+  },
+  {
+    id: 'hist-4',
+    orden_id: 'orden-2',
+    estado_anterior: 'contactado',
+    estado_nuevo: 'confirmado',
+    comentario: 'Confirmado para recoger el sábado',
+    usuario_admin_id: 'admin-2',
+    created_at: '2024-01-25T15:45:00Z',
+  },
+  {
+    id: 'hist-5',
+    orden_id: 'orden-2',
+    estado_anterior: 'confirmado',
+    estado_nuevo: 'preparando',
+    comentario: 'Orden en preparación',
+    usuario_admin_id: 'admin-2',
+    created_at: '2024-01-25T16:00:00Z',
+  },
+  {
+    id: 'hist-6',
+    orden_id: 'orden-4',
+    estado_anterior: 'pendiente',
+    estado_nuevo: 'contactado',
+    comentario: 'Cliente contactado por teléfono',
+    usuario_admin_id: 'admin-1',
+    created_at: '2024-01-24T17:00:00Z',
+  },
+  {
+    id: 'hist-7',
+    orden_id: 'orden-4',
+    estado_anterior: 'contactado',
+    estado_nuevo: 'confirmado',
+    comentario: 'Orden confirmada, acepta envío express',
+    usuario_admin_id: 'admin-1',
+    created_at: '2024-01-24T18:30:00Z',
+  },
+  {
+    id: 'hist-8',
+    orden_id: 'orden-4',
+    estado_anterior: 'confirmado',
+    estado_nuevo: 'preparando',
+    comentario: 'Orden preparada para envío',
+    usuario_admin_id: 'admin-2',
+    created_at: '2024-01-24T20:00:00Z',
+  },
+  {
+    id: 'hist-9',
+    orden_id: 'orden-4',
+    estado_anterior: 'preparando',
+    estado_nuevo: 'enviado',
+    comentario: 'Enviado con paquetería express - Guía: EXP123456789',
+    usuario_admin_id: 'admin-2',
+    created_at: '2024-01-25T08:00:00Z',
   },
 ]; 
