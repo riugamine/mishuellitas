@@ -3,6 +3,11 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignOutAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { useAuthStore } from "@/lib/store/useAuthStore";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -13,6 +18,18 @@ interface AdminLayoutProps {
  * @param children - The content to be rendered in the main area
  */
 export function AdminLayout({ children }: AdminLayoutProps) {
+  const { user, isLoading } = useAuthStore()
+  const { logout } = useAuth()
+
+  /**
+   * Handle logout action
+   */
+  const handleLogout = async () => {
+    if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+      await logout()
+    }
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -30,8 +47,31 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             
             {/* Header Actions */}
             <div className="flex items-center space-x-3">
-              <div className="text-sm text-muted-foreground">
-                Mis Huellitas Admin
+              {/* User Info */}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 text-sm">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                    <FontAwesomeIcon icon={faUser} className="text-primary-foreground text-xs" />
+                  </div>
+                  <div className="hidden sm:block">
+                    <p className="text-foreground font-medium">{user?.email}</p>
+                    <p className="text-muted-foreground text-xs capitalize">{user?.role}</p>
+                  </div>
+                </div>
+                
+                <Separator orientation="vertical" className="h-8 bg-border" />
+                
+                {/* Logout Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={isLoading}
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Cerrar Sesión</span>
+                </Button>
               </div>
             </div>
           </div>

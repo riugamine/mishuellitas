@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Montserrat } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConditionalLayout } from '@/components/conditional-layout';
+
 import { Toaster } from 'sonner';
 
 import "./globals.css";
