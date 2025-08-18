@@ -44,12 +44,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: profile, error: profileError } = await supabase
       .from('perfiles_usuario')
       .select('*')
-      .eq('usuario_id', authData.user.id)
+      .eq('id', authData.user.id)
       .single()
     
     if (profileError || !profile) {
       // Sign out the user since they don't have a valid profile
       await supabase.auth.signOut()
+      
+      console.error('Profile error:', profileError)
+      console.log('Looking for user ID:', authData.user.id)
       
       const response: AuthResponse = {
         success: false,
@@ -58,8 +61,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response, { status: 404 })
     }
     
-    // Check if user is admin
-    if (profile.rol !== 'admin' && profile.rol !== 'moderador') {
+    // Check if user is admin (according to schema: 'admin' or 'super_admin')
+    if (profile.rol !== 'admin' && profile.rol !== 'super_admin') {
       // Sign out the user since they don't have admin privileges
       await supabase.auth.signOut()
       
@@ -70,8 +73,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response, { status: 403 })
     }
     
-    // Check if user is active
-    if (!profile.activo) {
+    // Check if user is active (according to schema: 'is_active')
+    if (!profile.is_active) {
       // Sign out the inactive user
       await supabase.auth.signOut()
       

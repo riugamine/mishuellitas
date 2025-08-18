@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useAuthStore } from '@/lib/store/useAuthStore'
 import { toast } from 'sonner'
+import { completeAuthCleanup } from '@/lib/utils/auth-cleanup'
 import type { LoginFormData, AuthResponse } from '@/lib/types/auth.types'
 
 /**
@@ -14,9 +15,9 @@ export function useAuth() {
   const [loginError, setLoginError] = useState<Error | null>(null)
 
   /**
-   * Login function using async/await
+   * Login function using async/await - memoized to prevent dependency changes
    */
-  const login = async (credentials: LoginFormData): Promise<void> => {
+  const login = useCallback(async (credentials: LoginFormData): Promise<void> => {
     try {
       setLoading(true)
       setLoginError(null)
@@ -39,8 +40,12 @@ export function useAuth() {
         setUser(data.user)
         toast.success(data.message)
         
-        // Redirect to dashboard
-        window.location.href = '/admin/dashboard'
+        // Check for returnUrl in URL params, otherwise go to dashboard
+        const urlParams = new URLSearchParams(window.location.search)
+        const returnUrl = urlParams.get('returnUrl') || '/admin/dashboard'
+        
+        // Redirect to intended destination
+        window.location.href = returnUrl
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión'
@@ -49,15 +54,17 @@ export function useAuth() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [setUser, setLoading, setLoginError])
 
   /**
-   * Logout function using async/await
+   * Logout function using async/await - memoized to prevent dependency changes
+   * Clears all authentication data: API session, cookies, and local store
    */
-  const logout = async (): Promise<void> => {
+  const logout = useCallback(async (): Promise<void> => {
     try {
       setLoading(true)
 
+      // Call logout API to clear server-side session
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
       })
@@ -69,23 +76,25 @@ export function useAuth() {
       } else {
         // Still logout locally even if API fails
         console.error('Logout API error:', data.message)
+        toast.success('Sesión cerrada localmente')
       }
     } catch (error) {
       console.error('Logout error:', error)
       // Still logout locally even if API fails
+      toast.success('Sesión cerrada localmente')
     } finally {
-      // Always clear local state
+      // Clear all local authentication data
       clearAuth()
       
-      // Redirect to admin login
-      window.location.href = '/admin'
+      // Perform complete authentication cleanup
+      completeAuthCleanup()
     }
-  }
+  }, [setLoading, clearAuth])
 
   /**
-   * Check current user authentication (manual check)
+   * Check current user authentication (manual check) - memoized to prevent dependency changes
    */
-  const checkAuth = async (): Promise<boolean> => {
+  const checkAuth = useCallback(async (): Promise<boolean> => {
     try {
       setLoading(true)
 
@@ -104,7 +113,7 @@ export function useAuth() {
       clearAuth()
       return false
     }
-  }
+  }, [setLoading, setUser, clearAuth])
 
   return {
     // State

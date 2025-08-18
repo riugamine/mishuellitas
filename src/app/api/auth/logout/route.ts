@@ -11,7 +11,7 @@ export async function POST(): Promise<NextResponse> {
     // Create Supabase client
     const supabase = await createClient()
     
-    // Sign out user
+    // Sign out user from Supabase (this clears server-side session and cookies)
     const { error: signOutError } = await supabase.auth.signOut()
     
     if (signOutError) {
@@ -28,7 +28,30 @@ export async function POST(): Promise<NextResponse> {
       message: 'Sesión cerrada exitosamente'
     }
     
-    return NextResponse.json(response)
+    // Create response with cleared cookies
+    const nextResponse = NextResponse.json(response)
+    
+    // Clear Supabase auth cookies explicitly
+    const cookiesToClear = [
+      'sb-access-token',
+      'sb-refresh-token', 
+      'supabase-auth-token',
+      'supabase.auth.token'
+    ]
+    
+    cookiesToClear.forEach(cookieName => {
+      nextResponse.cookies.set(cookieName, '', {
+        expires: new Date(0),
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      })
+    })
+    
+    console.log('🧹 Server-side logout completed, cookies cleared')
+    
+    return nextResponse
     
   } catch (error) {
     console.error('Logout error:', error)

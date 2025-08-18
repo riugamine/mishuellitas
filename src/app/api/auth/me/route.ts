@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server'
  * GET /api/auth/me
  */
 export async function GET(): Promise<NextResponse> {
-  console.log('🚨 API /auth/me called - This should NOT happen automatically!')
   try {
     // Create Supabase client
     const supabase = await createClient()
@@ -27,7 +26,7 @@ export async function GET(): Promise<NextResponse> {
     const { data: profile, error: profileError } = await supabase
       .from('perfiles_usuario')
       .select('*')
-      .eq('usuario_id', user.id)
+      .eq('id', user.id)
       .single()
     
     if (profileError || !profile) {
@@ -41,8 +40,8 @@ export async function GET(): Promise<NextResponse> {
       return NextResponse.json(response, { status: 404 })
     }
     
-    // Check if user is admin
-    if (profile.rol !== 'admin' && profile.rol !== 'moderador') {
+    // Check if user is admin (according to schema: 'admin' or 'super_admin')
+    if (profile.rol !== 'admin' && profile.rol !== 'super_admin') {
       // Sign out the user since they don't have admin privileges
       await supabase.auth.signOut()
       
@@ -53,8 +52,8 @@ export async function GET(): Promise<NextResponse> {
       return NextResponse.json(response, { status: 403 })
     }
     
-    // Check if user is active
-    if (!profile.activo) {
+    // Check if user is active (according to schema: 'is_active')
+    if (!profile.is_active) {
       // Sign out the inactive user
       await supabase.auth.signOut()
       

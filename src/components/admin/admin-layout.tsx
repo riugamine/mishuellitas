@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -8,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOutAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { LogoutConfirmationDialog } from "./logout-confirmation-dialog";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -15,19 +17,61 @@ interface AdminLayoutProps {
 
 /**
  * Main admin layout component that provides the sidebar navigation and header
+ * Optimized with useMemo and useCallback to prevent infinite loops
  * @param children - The content to be rendered in the main area
  */
 export function AdminLayout({ children }: AdminLayoutProps) {
-  const { user, isLoading } = useAuthStore()
-  const { logout } = useAuth()
+  const { user, isAuthenticated, isLoading } = useAuthStore()
+  const { logout, checkAuth } = useAuth()
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+
+  /**
+   * Memoize auth state to prevent unnecessary re-renders
+   */
+  const authState = useMemo(() => ({
+    hasUser: !!user,
+    isAuthenticated,
+    isLoading
+  }), [user, isAuthenticated, isLoading])
+
+  /**
+   * Stable checkAuth function to prevent dependency changes
+   */
+  const stableCheckAuth = useCallback(() => {
+    checkAuth()
+  }, [checkAuth])
+
+  /**
+   * Sync user state on mount only - runs once to avoid infinite loops
+   * Only makes API call if absolutely necessary for UI display
+   * Uses memoized values and ref to ensure single execution
+   */
+  useEffect(() => {
+    let mounted = true
+    
+    // Only check auth once if we don't have user data AND we're not loading AND we're authenticated
+    if (!authState.hasUser && !authState.isLoading && authState.isAuthenticated && mounted) {
+      stableCheckAuth()
+    }
+
+    return () => {
+      mounted = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Empty dependency array to run only on mount
 
   /**
    * Handle logout action
    */
   const handleLogout = async () => {
-    if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-      await logout()
-    }
+    await logout()
+  }
+
+  /**
+   * Show logout confirmation dialog
+   */
+  const showLogoutConfirmation = () => {
+    setShowLogoutDialog(true)
   }
 
   return (
@@ -65,7 +109,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleLogout}
+                  onClick={showLogoutConfirmation}
                   disabled={isLoading}
                   className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                 >
@@ -82,6 +126,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           {children}
         </div>
       </main>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmationDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        onConfirm={handleLogout}
+        isLoading={isLoading}
+      />
     </SidebarProvider>
   );
 } 

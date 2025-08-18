@@ -53,11 +53,20 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       clearAuth: () => {
+        // Clear all auth state
         set({
           user: null,
           isAuthenticated: false,
           isLoading: false,
         })
+        
+        // Clear persisted data from localStorage
+        try {
+          localStorage.removeItem('auth-storage-v2')
+          console.log('🧹 Cleared auth store from localStorage')
+        } catch (error) {
+          console.error('Error clearing auth storage:', error)
+        }
       },
     }),
     {
