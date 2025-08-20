@@ -31,22 +31,13 @@ export async function POST(): Promise<NextResponse> {
     // Create response with cleared cookies
     const nextResponse = NextResponse.json(response)
     
-    // Clear Supabase auth cookies explicitly
-    const cookiesToClear = [
-      'sb-access-token',
-      'sb-refresh-token', 
-      'supabase-auth-token',
-      'supabase.auth.token'
-    ]
-    
-    cookiesToClear.forEach(cookieName => {
-      nextResponse.cookies.set(cookieName, '', {
-        expires: new Date(0),
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      })
+    // Clear authentication session cookie
+    nextResponse.cookies.set('auth-session', '', {
+      expires: new Date(0),
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax'
     })
     
     console.log('🧹 Server-side logout completed, cookies cleared')

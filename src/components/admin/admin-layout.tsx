@@ -42,15 +42,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }, [checkAuth])
 
   /**
-   * Sync user state on mount only - runs once to avoid infinite loops
-   * Only makes API call if absolutely necessary for UI display
-   * Uses memoized values and ref to ensure single execution
+   * Sync user state on mount and handle authentication
+   * Middleware handles redirects, we only sync user data
    */
   useEffect(() => {
     let mounted = true
     
-    // Only check auth once if we don't have user data AND we're not loading AND we're authenticated
-    if (!authState.hasUser && !authState.isLoading && authState.isAuthenticated && mounted) {
+    // If authenticated but no user data, fetch user info
+    if (authState.isAuthenticated && !authState.hasUser && !authState.isLoading && mounted) {
+    
       stableCheckAuth()
     }
 
@@ -58,7 +58,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       mounted = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Empty dependency array to run only on mount
+  }, [authState.isAuthenticated, authState.hasUser, authState.isLoading]) // Watch for auth state changes
 
   /**
    * Handle logout action
@@ -72,6 +72,29 @@ export function AdminLayout({ children }: AdminLayoutProps) {
    */
   const showLogoutConfirmation = () => {
     setShowLogoutDialog(true)
+  }
+
+  // Show loading state while checking authentication
+  if (isLoading && !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Verificando autenticación...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If not authenticated, don't render anything (redirect will happen)
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <p className="text-muted-foreground">Redirigiendo al login...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

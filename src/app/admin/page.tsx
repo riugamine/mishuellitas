@@ -15,12 +15,10 @@ export default function AdminPage() {
   const searchParams = useSearchParams()
 
   /**
-   * Simple redirect for already authenticated users
+   * Immediate redirect for already authenticated users
    */
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log('isAuthenticated', isAuthenticated)
-      console.log('user', user)
       // Get return URL from middleware redirect or default to dashboard
       const returnUrl = searchParams.get('returnUrl') || '/admin/dashboard'
       router.replace(returnUrl)

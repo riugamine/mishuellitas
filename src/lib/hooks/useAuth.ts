@@ -40,12 +40,6 @@ export function useAuth() {
         setUser(data.user)
         toast.success(data.message)
         
-        // Check for returnUrl in URL params, otherwise go to dashboard
-        const urlParams = new URLSearchParams(window.location.search)
-        const returnUrl = urlParams.get('returnUrl') || '/admin/dashboard'
-        
-        // Redirect to intended destination
-        window.location.href = returnUrl
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión'
@@ -98,13 +92,17 @@ export function useAuth() {
     try {
       setLoading(true)
 
-      const response = await fetch('/api/auth/me')
+      const response = await fetch('/api/auth/me', {
+        credentials: 'include', // Ensure cookies are included
+      })
       const data: AuthResponse = await response.json()
 
       if (response.ok && data.success && data.user) {
         setUser(data.user)
+        console.log('✅ Auth check successful:', data.user.email)
         return true
       } else {
+        console.log('❌ Auth check failed:', data.message)
         clearAuth()
         return false
       }
@@ -112,6 +110,8 @@ export function useAuth() {
       console.error('Auth check error:', error)
       clearAuth()
       return false
+    } finally {
+      setLoading(false)
     }
   }, [setLoading, setUser, clearAuth])
 

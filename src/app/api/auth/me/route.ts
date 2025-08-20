@@ -1,20 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
 import { type AuthResponse } from '@/lib/types/auth.types'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 /**
- * Get current authenticated user
+ * Get current authenticated user from session cookie
  * GET /api/auth/me
  */
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
-    // Create Supabase client
-    const supabase = await createClient()
+    // Get auth session cookie
+    const authSessionCookie = request.cookies.get('auth-session')
     
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
-    if (userError || !user) {
+    if (!authSessionCookie) {
       const response: AuthResponse = {
         success: false,
         message: 'No hay usuario autenticado'
@@ -22,55 +18,43 @@ export async function GET(): Promise<NextResponse> {
       return NextResponse.json(response, { status: 401 })
     }
     
-    // Get user profile
-    const { data: profile, error: profileError } = await supabase
-      .from('perfiles_usuario')
-      .select('*')
-      .eq('id', user.id)
-      .single()
-    
-    if (profileError || !profile) {
-      // Sign out the user since they don't have a valid profile
-      await supabase.auth.signOut()
-      
+    // Parse session data
+    let sessionData
+    try {
+      sessionData = JSON.parse(authSessionCookie.value)
+    } catch (error) {
       const response: AuthResponse = {
         success: false,
-        message: 'Perfil de usuario no encontrado. Contacta al administrador.'
+        message: 'Sesión inválida'
       }
-      return NextResponse.json(response, { status: 404 })
+      return NextResponse.json(response, { status: 401 })
     }
     
-    // Check if user is admin (according to schema: 'admin' or 'super_admin')
-    if (profile.rol !== 'admin' && profile.rol !== 'super_admin') {
-      // Sign out the user since they don't have admin privileges
-      await supabase.auth.signOut()
-      
+    // Check if session is still valid (not expired)
+    if (!sessionData.expiresAt || Date.now() >= sessionData.expiresAt) {
       const response: AuthResponse = {
         success: false,
-        message: 'No tienes permisos para acceder al panel de administración'
+        message: 'Sesión expirada'
       }
-      return NextResponse.json(response, { status: 403 })
+      return NextResponse.json(response, { status: 401 })
     }
     
-    // Check if user is active (according to schema: 'is_active')
-    if (!profile.is_active) {
-      // Sign out the inactive user
-      await supabase.auth.signOut()
-      
+    // Validate session data structure
+    if (!sessionData.userId || !sessionData.email || !sessionData.role) {
       const response: AuthResponse = {
         success: false,
-        message: 'Tu cuenta está desactivada. Contacta al administrador'
+        message: 'Datos de sesión incompletos'
       }
-      return NextResponse.json(response, { status: 403 })
+      return NextResponse.json(response, { status: 401 })
     }
     
     const response: AuthResponse = {
       success: true,
       message: 'Usuario autenticado',
       user: {
-        id: user.id,
-        email: user.email!,
-        role: profile.rol
+        id: sessionData.userId,
+        email: sessionData.email,
+        role: sessionData.role
       }
     }
     

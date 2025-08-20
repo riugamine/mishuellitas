@@ -85,6 +85,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response, { status: 403 })
     }
     
+    // Create response with session cookies
     const response: AuthResponse = {
       success: true,
       message: 'Inicio de sesión exitoso',
@@ -95,7 +96,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
     
-    return NextResponse.json(response)
+    // Create NextResponse with the JSON data
+    const nextResponse = NextResponse.json(response)
+    
+    // Set single authentication cookie
+    if (authData.session) {
+      // Create auth session data
+      const authSessionData = {
+        userId: authData.user.id,
+        email: authData.user.email,
+        role: profile.rol,
+        expiresAt: Date.now() + (authData.session.expires_in * 1000)
+      }
+      
+      // Set authentication cookie
+      nextResponse.cookies.set('auth-session', JSON.stringify(authSessionData), {
+        httpOnly: true,
+        secure: true, // Always secure in production and development
+        sameSite: 'lax',
+        maxAge: authData.session.expires_in,
+        path: '/',
+      })
+      
+      console.log('✅ Authentication session cookie set successfully')
+    }
+    
+    return nextResponse
     
   } catch (error) {
     console.error('Login error:', error)

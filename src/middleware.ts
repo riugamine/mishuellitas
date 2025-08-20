@@ -23,49 +23,28 @@ export function middleware(request: NextRequestType) {
 }
 
 /**
- * Check authentication status using only cookies to avoid DB queries
- * Priority order: auth-storage-v2 (Zustand store) > Supabase cookies
+ * Check authentication status using only the auth session cookie
  */
-function checkAuthenticationFromCookies(request: NextRequestType): boolean {
-  // 1. First priority: Check Zustand auth store cookie (most reliable)
-  const authStorageCookie = request.cookies.get('auth-storage-v2')
-  if (authStorageCookie) {
-    try {
-      const authData = JSON.parse(authStorageCookie.value)
-      const isValid = authData?.state?.isAuthenticated === true && 
-                     authData?.state?.user?.id && 
-                     authData?.state?.user?.email
-      
-      if (isValid) {
-        return true
-      }
-    } catch (error) {
-      // Invalid JSON, continue to other checks
-      console.warn('Invalid auth-storage-v2 cookie format')
-    }
+function checkAuthenticationFromCookies(request: NextRequestType) {
+  const authSessionCookie = request.cookies.get('auth-session')
+  
+  if (!authSessionCookie) {
+    return false
   }
   
-  // 2. Second priority: Check Supabase session cookies
-  const supabaseAccessToken = request.cookies.get('sb-access-token')
-  const supabaseRefreshToken = request.cookies.get('sb-refresh-token')
-  
-  if (supabaseAccessToken?.value && supabaseRefreshToken?.value) {
-    // Basic validation: check if tokens exist and are not empty
-    const accessTokenValid = supabaseAccessToken.value.length > 20
-    const refreshTokenValid = supabaseRefreshToken.value.length > 20
+  try {
+    const authData = JSON.parse(authSessionCookie.value)
     
-    if (accessTokenValid && refreshTokenValid) {
+    // Check if session is still valid (not expired)
+    if (authData.expiresAt && Date.now() < authData.expiresAt) {
       return true
     }
+    
+    return false
+  } catch (error) {
+    console.warn('Invalid auth-session cookie format')
+    return false
   }
-  
-  // 3. Fallback: Check legacy Supabase auth token
-  const legacyAuthToken = request.cookies.get('supabase-auth-token')
-  if (legacyAuthToken?.value && legacyAuthToken.value.length > 20) {
-    return true
-  }
-  
-  return false
 }
 
 export const config = {
