@@ -16,6 +16,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreateCategoryModal } from "@/components/admin/categories/create-category-modal";
 import { DeleteCategoryDialog } from "@/components/admin/categories/delete-category-dialog";
+import { CategoryDetailModal } from "@/components/admin/categories/category-detail-modal";
+import { EditCategoryModal } from "@/components/admin/categories/edit-category-modal";
 import { useCategories } from "@/lib/hooks/useCategories";
 import { CategoryWithSubcategories } from "@/lib/types/database.types";
 
@@ -26,12 +28,32 @@ export function CategoryList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryToDelete, setCategoryToDelete] = useState<CategoryWithSubcategories | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [categoryToView, setCategoryToView] = useState<string | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<CategoryWithSubcategories | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const { data: categories, isLoading, error } = useCategories();
 
   const filteredCategories = categories?.filter(category =>
     category.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (category.descripcion && category.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
+
+  /**
+   * Handle view category button click
+   */
+  const handleViewClick = (categoryId: string) => {
+    setCategoryToView(categoryId);
+    setShowDetailModal(true);
+  };
+
+  /**
+   * Handle edit category button click
+   */
+  const handleEditClick = (category: CategoryWithSubcategories) => {
+    setCategoryToEdit(category);
+    setShowEditModal(true);
+  };
 
   /**
    * Handle delete category button click
@@ -42,11 +64,53 @@ export function CategoryList() {
   };
 
   /**
+   * Close detail modal
+   */
+  const handleCloseDetailModal = () => {
+    setShowDetailModal(false);
+    setCategoryToView(null);
+  };
+
+  /**
+   * Close edit modal
+   */
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setCategoryToEdit(null);
+  };
+
+  /**
    * Close delete dialog
    */
   const handleCloseDeleteDialog = () => {
     setShowDeleteDialog(false);
     setCategoryToDelete(null);
+  };
+
+  /**
+   * Handle edit from detail modal
+   */
+  const handleEditFromDetail = (category: CategoryWithSubcategories) => {
+    // Close detail modal first
+    setShowDetailModal(false);
+    setCategoryToView(null);
+    
+    // Open edit modal
+    setCategoryToEdit(category);
+    setShowEditModal(true);
+  };
+
+  /**
+   * Handle delete from detail modal
+   */
+  const handleDeleteFromDetail = (category: CategoryWithSubcategories) => {
+    // Close detail modal first
+    setShowDetailModal(false);
+    setCategoryToView(null);
+    
+    // Open delete dialog
+    setCategoryToDelete(category);
+    setShowDeleteDialog(true);
   };
 
   return (
@@ -186,20 +250,18 @@ export function CategoryList() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    asChild
+                    onClick={() => handleViewClick(category.id)}
+                    title="Ver detalles"
                   >
-                    <Link href={`/admin/categorias/${category.id}`}>
-                      <FontAwesomeIcon icon={faEye} className="w-4 h-4" />
-                    </Link>
+                    <FontAwesomeIcon icon={faEye} className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    asChild
+                    onClick={() => handleEditClick(category)}
+                    title="Editar categoría"
                   >
-                    <Link href={`/admin/categorias/${category.id}/editar`}>
-                      <FontAwesomeIcon icon={faEdit} className="w-4 h-4" />
-                    </Link>
+                    <FontAwesomeIcon icon={faEdit} className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="ghost"
@@ -216,6 +278,22 @@ export function CategoryList() {
                   ))}
         </div>
       )}
+
+      {/* Category Detail Modal */}
+      <CategoryDetailModal
+        categoryId={categoryToView}
+        open={showDetailModal}
+        onOpenChange={handleCloseDetailModal}
+        onEdit={handleEditFromDetail}
+        onDelete={handleDeleteFromDetail}
+      />
+
+      {/* Edit Category Modal */}
+      <EditCategoryModal
+        category={categoryToEdit}
+        open={showEditModal}
+        onOpenChange={handleCloseEditModal}
+      />
 
       {/* Delete Category Dialog */}
       <DeleteCategoryDialog

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Category, CategoryCreateInput, CategoryWithSubcategories } from '@/lib/types/database.types';
+import { Category, CategoryCreateInput, CategoryUpdateInput, CategoryWithSubcategories } from '@/lib/types/database.types';
 
 /**
  * Fetch all categories from API
@@ -40,6 +40,27 @@ async function createCategory(categoryData: CategoryCreateInput): Promise<Catego
 }
 
 /**
+ * Update a category
+ */
+async function updateCategory(categoryId: string, categoryData: CategoryUpdateInput): Promise<Category> {
+  const response = await fetch(`/api/categories/${categoryId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(categoryData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Error al actualizar la categoría');
+  }
+
+  const data = await response.json();
+  return data.category;
+}
+
+/**
  * Delete a category
  */
 async function deleteCategory(categoryId: string): Promise<void> {
@@ -51,6 +72,20 @@ async function deleteCategory(categoryId: string): Promise<void> {
     const errorData = await response.json();
     throw new Error(errorData.error || 'Error al eliminar la categoría');
   }
+}
+
+/**
+ * Fetch a single category with all details
+ */
+async function fetchCategoryById(categoryId: string): Promise<CategoryWithSubcategories> {
+  const response = await fetch(`/api/categories/${categoryId}`);
+  
+  if (!response.ok) {
+    throw new Error('Error al obtener la categoría');
+  }
+  
+  const data = await response.json();
+  return data.category;
 }
 
 /**
@@ -92,6 +127,35 @@ export function useCreateCategory() {
 }
 
 /**
+ * Hook to update a category
+ */
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ categoryId, categoryData }: { categoryId: string; categoryData: CategoryUpdateInput }) =>
+      updateCategory(categoryId, categoryData),
+    onSuccess: (updatedCategory) => {
+      // Invalidate and refetch categories
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      // Also invalidate the specific category query
+      queryClient.invalidateQueries({ queryKey: ['category', updatedCategory.id] });
+      
+      // Show success toast
+      toast.success('Categoría actualizada exitosamente', {
+        description: `La categoría "${updatedCategory.nombre}" ha sido actualizada.`,
+      });
+    },
+    onError: (error: Error) => {
+      // Show error toast
+      toast.error('Error al actualizar la categoría', {
+        description: error.message,
+      });
+    },
+  });
+}
+
+/**
  * Hook to delete a category
  */
 export function useDeleteCategory() {
@@ -114,6 +178,19 @@ export function useDeleteCategory() {
         description: error.message,
       });
     },
+  });
+}
+
+/**
+ * Hook to fetch a single category by ID
+ */
+export function useCategory(categoryId: string) {
+  return useQuery({
+    queryKey: ['category', categoryId],
+    queryFn: () => fetchCategoryById(categoryId),
+    enabled: !!categoryId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 

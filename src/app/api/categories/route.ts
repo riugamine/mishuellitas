@@ -1,24 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { generateSlug, generateUniqueSlug } from '@/lib/utils/slug-generator';
 import { CategoryCreateInput } from '@/lib/types/database.types';
 import { deleteCategoryImage } from '@/lib/utils/image-upload';
-
-/**
- * Create Supabase client with service role for server-side operations
- */
-function createServiceClient() {
-  return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  );
-}
+import { createServiceClient } from '@/lib/supabase/service';
 
 /**
  * GET - Fetch all categories
