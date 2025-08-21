@@ -47,6 +47,22 @@ export interface CategoryWithSubcategories extends Category {
 }
 
 /**
+ * Subcategory with parent information for display
+ */
+export interface SubcategoryWithParent extends Category {
+  parent_category: {
+    nombre: string;
+    slug: string;
+  };
+  product_count: number;
+}
+
+/**
+ * Union type for category operations (can be main category or subcategory)
+ */
+export type CategoryForOperations = CategoryWithSubcategories | (Category & { product_count: number });
+
+/**
  * Product type based on Supabase products table
  */
 export interface Product {

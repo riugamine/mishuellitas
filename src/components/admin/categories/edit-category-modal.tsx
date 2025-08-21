@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 
 import { useUpdateCategory, useParentCategories } from "@/lib/hooks/useCategories";
-import { CategoryWithSubcategories, CategoryUpdateInput } from "@/lib/types/database.types";
+import { CategoryWithSubcategories, CategoryUpdateInput, CategoryForOperations } from "@/lib/types/database.types";
 import { validateImageFile } from "@/lib/utils/image-upload";
 import { toast } from "sonner";
 
@@ -61,7 +61,7 @@ const editCategorySchema = z.object({
 type EditCategoryFormData = z.infer<typeof editCategorySchema>;
 
 interface EditCategoryModalProps {
-  category: CategoryWithSubcategories | null;
+  category: CategoryForOperations | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }

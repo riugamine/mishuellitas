@@ -2,12 +2,15 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Category, CategoryCreateInput, CategoryUpdateInput, CategoryWithSubcategories } from '@/lib/types/database.types';
+import { Category, CategoryCreateInput, CategoryUpdateInput, CategoryWithSubcategories, SubcategoryWithParent } from '@/lib/types/database.types';
 
 /**
- * Fetch all categories from API
+ * Fetch all categories and subcategories from API
  */
-async function fetchCategories(): Promise<CategoryWithSubcategories[]> {
+async function fetchCategoriesAndSubcategories(): Promise<{
+  categories: CategoryWithSubcategories[];
+  subcategories: SubcategoryWithParent[];
+}> {
   const response = await fetch('/api/categories');
   
   if (!response.ok) {
@@ -15,6 +18,17 @@ async function fetchCategories(): Promise<CategoryWithSubcategories[]> {
   }
   
   const data = await response.json();
+  return {
+    categories: data.categories || [],
+    subcategories: data.subcategories || []
+  };
+}
+
+/**
+ * Fetch all categories from API (backward compatibility)
+ */
+async function fetchCategories(): Promise<CategoryWithSubcategories[]> {
+  const data = await fetchCategoriesAndSubcategories();
   return data.categories;
 }
 
@@ -207,4 +221,16 @@ export function useParentCategories() {
     data: parentCategories,
     ...rest,
   };
+}
+
+/**
+ * Hook to fetch both categories and subcategories
+ */
+export function useCategoriesAndSubcategories() {
+  return useQuery({
+    queryKey: ['categories-and-subcategories'],
+    queryFn: fetchCategoriesAndSubcategories,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
 }

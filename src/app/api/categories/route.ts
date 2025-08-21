@@ -11,6 +11,7 @@ export async function GET() {
   try {
     const supabase = createServiceClient();
 
+    // Fetch main categories with their subcategories
     const { data: categories, error } = await supabase
       .from('categorias')
       .select(`
@@ -21,7 +22,18 @@ export async function GET() {
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
-    // Add product count for each category
+    // Fetch all subcategories separately for the subcategories list
+    const { data: subcategories, error: subcategoriesError } = await supabase
+      .from('categorias')
+      .select(`
+        *,
+        parent_category:categorias!parent_id(nombre, slug)
+      `)
+      .not('parent_id', 'is', null)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    // Add product count for main categories
     if (categories) {
       for (const category of categories) {
         // Try to get product count, but don't fail if productos table doesn't exist
@@ -45,6 +57,28 @@ export async function GET() {
       }
     }
 
+    // Add product count for subcategories
+    if (subcategories) {
+      for (const subcategory of subcategories) {
+        try {
+          const { data: products, error: productError } = await supabase
+            .from('productos')
+            .select('id')
+            .eq('categoria_id', subcategory.id);
+          
+          if (productError) {
+            console.warn(`Could not fetch products for subcategory ${subcategory.id}:`, productError);
+            subcategory.product_count = 0;
+          } else {
+            subcategory.product_count = products?.length || 0;
+          }
+        } catch (error) {
+          console.warn(`Error fetching products for subcategory ${subcategory.id}:`, error);
+          subcategory.product_count = 0;
+        }
+      }
+    }
+
     if (error) {
       console.error('Error fetching categories:', error);
       return NextResponse.json(
@@ -53,7 +87,18 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ categories });
+    if (subcategoriesError) {
+      console.error('Error fetching subcategories:', subcategoriesError);
+      return NextResponse.json(
+        { error: 'Error al obtener las subcategorías' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ 
+      categories, 
+      subcategories: subcategories || [] 
+    });
   } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(

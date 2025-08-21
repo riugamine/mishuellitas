@@ -16,10 +16,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 import { useDeleteCategory } from "@/lib/hooks/useCategories";
-import { CategoryWithSubcategories } from "@/lib/types/database.types";
+import { CategoryWithSubcategories, CategoryForOperations } from "@/lib/types/database.types";
 
 interface DeleteCategoryDialogProps {
-  category: CategoryWithSubcategories | null;
+  category: CategoryForOperations | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
