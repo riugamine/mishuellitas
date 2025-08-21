@@ -1,14 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-/**
- * Create Supabase client for storage operations
- */
-function createStorageClient() {
-  return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!
-  );
-}
+import { createServiceClient } from '@/lib/supabase/service';
 
 /**
  * Upload category image to Supabase Storage
@@ -22,7 +12,7 @@ export async function uploadCategoryImage(
   categorySlug: string, 
   isSubcategory: boolean = false
 ): Promise<string> {
-  const supabase = createStorageClient();
+  const supabase = createServiceClient();
   
   // Validate file type
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -58,7 +48,7 @@ export async function uploadCategoryImage(
     
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('category-assets')
+      .from('product-assets')
       .getPublicUrl(filePath);
     
     return urlData.publicUrl;
@@ -74,7 +64,7 @@ export async function uploadCategoryImage(
  * @returns Promise<void>
  */
 export async function deleteCategoryImage(imageUrl: string): Promise<void> {
-  const supabase = createStorageClient();
+  const supabase = createServiceClient();
   
   try {
     // Extract file path from URL
@@ -89,7 +79,7 @@ export async function deleteCategoryImage(imageUrl: string): Promise<void> {
     const filePath = pathParts.slice(bucketIndex + 1).join('/');
     
     const { error } = await supabase.storage
-      .from('category-assets')
+      .from('product-assets')
       .remove([filePath]);
     
     if (error) {

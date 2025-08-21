@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateImageFile } from '@/lib/utils/image-upload';
 import { generateSlug } from '@/lib/utils/slug-generator';
+import { createServiceClient } from '@/lib/supabase/service';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -37,11 +38,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create authenticated Supabase client
-    const supabase = await createClient();
-
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // First, verify user is authenticated using session client
+    const sessionClient = await createClient();
+    const { data: { user }, error: authError } = await sessionClient.auth.getUser();
     
     if (authError || !user) {
       return NextResponse.json(
@@ -50,18 +49,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate slug for file naming
-    const categorySlug = generateSlug(categoryName);
+    // Use service client for storage operations (has elevated permissions)
+    const serviceClient = createServiceClient();
 
     // Generate file path
     const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const categorySlug = generateSlug(categoryName);
     const folderPath = isSubcategory ? 'categories/subcategories' : 'categories/main-categories';
     const fileName = `${categorySlug}-${Date.now()}.${fileExtension}`;
     const filePath = `${folderPath}/${fileName}`;
 
-    // Upload file to Supabase Storage with authenticated client
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('category-assets')
+    // Upload file to Supabase Storage using service client
+    const { data: uploadData, error: uploadError } = await serviceClient.storage
+      .from('product-assets')
       .upload(filePath, file, {
         cacheControl: '3600',
         upsert: true,
@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('category-assets')
+    const { data: urlData } = serviceClient.storage
+      .from('product-assets')
       .getPublicUrl(filePath);
 
     const imageUrl = urlData.publicUrl;
