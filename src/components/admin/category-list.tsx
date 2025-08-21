@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreateCategoryModal } from "@/components/admin/categories/create-category-modal";
+import { DeleteCategoryDialog } from "@/components/admin/categories/delete-category-dialog";
 import { useCategories } from "@/lib/hooks/useCategories";
 import { CategoryWithSubcategories } from "@/lib/types/database.types";
 
@@ -23,6 +24,8 @@ import { CategoryWithSubcategories } from "@/lib/types/database.types";
  */
 export function CategoryList() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [categoryToDelete, setCategoryToDelete] = useState<CategoryWithSubcategories | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { data: categories, isLoading, error } = useCategories();
 
   const filteredCategories = categories?.filter(category =>
@@ -30,9 +33,20 @@ export function CategoryList() {
     (category.descripcion && category.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
   ) || [];
 
-  const handleDelete = (categoryId: string) => {
-    // TODO: Implement delete functionality
-    console.log("Delete category:", categoryId);
+  /**
+   * Handle delete category button click
+   */
+  const handleDeleteClick = (category: CategoryWithSubcategories) => {
+    setCategoryToDelete(category);
+    setShowDeleteDialog(true);
+  };
+
+  /**
+   * Close delete dialog
+   */
+  const handleCloseDeleteDialog = () => {
+    setShowDeleteDialog(false);
+    setCategoryToDelete(null);
   };
 
   return (
@@ -190,7 +204,7 @@ export function CategoryList() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleDelete(category.id)}
+                    onClick={() => handleDeleteClick(category)}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
@@ -202,6 +216,13 @@ export function CategoryList() {
                   ))}
         </div>
       )}
+
+      {/* Delete Category Dialog */}
+      <DeleteCategoryDialog
+        category={categoryToDelete}
+        open={showDeleteDialog}
+        onOpenChange={handleCloseDeleteDialog}
+      />
     </div>
   );
 } 

@@ -40,6 +40,20 @@ async function createCategory(categoryData: CategoryCreateInput): Promise<Catego
 }
 
 /**
+ * Delete a category
+ */
+async function deleteCategory(categoryId: string): Promise<void> {
+  const response = await fetch(`/api/categories?id=${categoryId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Error al eliminar la categoría');
+  }
+}
+
+/**
  * Hook to fetch all categories
  */
 export function useCategories() {
@@ -71,6 +85,32 @@ export function useCreateCategory() {
     onError: (error: Error) => {
       // Show error toast
       toast.error('Error al crear la categoría', {
+        description: error.message,
+      });
+    },
+  });
+}
+
+/**
+ * Hook to delete a category
+ */
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: () => {
+      // Invalidate and refetch categories
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      
+      // Show success toast
+      toast.success('Categoría eliminada exitosamente', {
+        description: 'La categoría ha sido eliminada correctamente.',
+      });
+    },
+    onError: (error: Error) => {
+      // Show error toast
+      toast.error('Error al eliminar la categoría', {
         description: error.message,
       });
     },
