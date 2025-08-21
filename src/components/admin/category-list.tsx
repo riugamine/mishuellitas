@@ -4,68 +4,31 @@ import { useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
-  faPlus, 
   faEdit, 
   faTrash, 
   faEye,
   faSearch,
-  faTags
+  faTags,
+  faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  productCount: number;
-  subcategories: string[];
-  status: "active" | "inactive";
-  createdAt: string;
-}
+import { CreateCategoryModal } from "@/components/admin/categories/create-category-modal";
+import { useCategories } from "@/lib/hooks/useCategories";
+import { CategoryWithSubcategories } from "@/lib/types/database.types";
 
 /**
  * Category list component with search and CRUD operations
  */
 export function CategoryList() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { data: categories, isLoading, error } = useCategories();
 
-  // Mock data - replace with actual data fetching
-  const categories: Category[] = [
-    {
-      id: "1",
-      name: "Mascotas",
-      description: "Productos para mascotas",
-      productCount: 25,
-      subcategories: ["Perros", "Gatos", "Aves"],
-      status: "active",
-      createdAt: "2024-01-15"
-    },
-    {
-      id: "2",
-      name: "Accesorios",
-      description: "Accesorios para mascotas",
-      productCount: 15,
-      subcategories: ["Collares", "Correas", "Juguetes"],
-      status: "active",
-      createdAt: "2024-01-10"
-    },
-    {
-      id: "3",
-      name: "Alimentos",
-      description: "Alimentos para mascotas",
-      productCount: 30,
-      subcategories: ["Perros", "Gatos", "Aves"],
-      status: "active",
-      createdAt: "2024-01-05"
-    }
-  ];
-
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCategories = categories?.filter(category =>
+    category.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (category.descripcion && category.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
+  ) || [];
 
   const handleDelete = (categoryId: string) => {
     // TODO: Implement delete functionality
@@ -80,12 +43,7 @@ export function CategoryList() {
           <h2 className="text-2xl font-bold text-gray-900">Categorías</h2>
           <p className="text-gray-600">Gestiona las categorías de productos</p>
         </div>
-        <Link href="/admin/categorias/nueva">
-          <Button className="flex items-center space-x-2">
-            <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
-            <span>Agregar Categoría</span>
-          </Button>
-        </Link>
+        <CreateCategoryModal />
       </div>
 
       {/* Search */}
@@ -107,43 +65,94 @@ export function CategoryList() {
         </CardContent>
       </Card>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <FontAwesomeIcon icon={faSpinner} className="w-8 h-8 animate-spin text-blue-600" />
+          <span className="ml-2 text-gray-600">Cargando categorías...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-red-600">Error al cargar las categorías</p>
+            <p className="text-sm text-gray-500 mt-1">{error.message}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !error && filteredCategories.length === 0 && (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <FontAwesomeIcon icon={faTags} className="w-12 h-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {searchTerm ? "No se encontraron categorías" : "No hay categorías"}
+            </h3>
+            <p className="text-gray-500 mb-4">
+              {searchTerm 
+                ? "Intenta con otros términos de búsqueda" 
+                : "Comienza creando tu primera categoría de productos"
+              }
+            </p>
+            {!searchTerm && <CreateCategoryModal />}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Categories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCategories.map((category) => (
+      {!isLoading && !error && filteredCategories.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCategories.map((category) => (
           <Card key={category.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faTags} className="w-5 h-5 text-blue-600" />
-                  <CardTitle className="text-lg">{category.name}</CardTitle>
+                  <CardTitle className="text-lg">{category.nombre}</CardTitle>
                 </div>
                 <Badge 
-                  variant={category.status === "active" ? "default" : "secondary"}
-                  className={category.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                  variant={category.is_active ? "default" : "secondary"}
+                  className={category.is_active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
                 >
-                  {category.status === "active" ? "Activo" : "Inactivo"}
+                  {category.is_active ? "Activo" : "Inactivo"}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 text-sm mb-4">{category.description}</p>
+              {/* Category Image */}
+              {category.cover_image_url && (
+                <div className="mb-4">
+                  <img
+                    src={category.cover_image_url}
+                    alt={category.nombre}
+                    className="w-full h-32 object-cover rounded-md"
+                  />
+                </div>
+              )}
+              
+              <p className="text-gray-600 text-sm mb-4">
+                {category.descripcion || "Sin descripción"}
+              </p>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Productos:</span>
-                  <span className="font-medium text-gray-900">{category.productCount}</span>
+                  <span className="font-medium text-gray-900">{category.product_count || 0}</span>
                 </div>
                 
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">Subcategorías:</span>
-                  <span className="font-medium text-gray-900">{category.subcategories.length}</span>
+                  <span className="font-medium text-gray-900">{category.subcategories?.length || 0}</span>
                 </div>
 
-                {category.subcategories.length > 0 && (
+                {category.subcategories && category.subcategories.length > 0 && (
                   <div className="flex flex-wrap gap-1">
-                    {category.subcategories.slice(0, 3).map((sub, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {sub}
+                    {category.subcategories.slice(0, 3).map((sub) => (
+                      <Badge key={sub.id} variant="outline" className="text-xs">
+                        {sub.nombre}
                       </Badge>
                     ))}
                     {category.subcategories.length > 3 && (
@@ -157,7 +166,7 @@ export function CategoryList() {
 
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                 <span className="text-xs text-gray-500">
-                  Creado: {new Date(category.createdAt).toLocaleDateString()}
+                  Creado: {new Date(category.created_at).toLocaleDateString()}
                 </span>
                 <div className="flex items-center space-x-2">
                   <Button
@@ -190,8 +199,9 @@ export function CategoryList() {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+                  ))}
+        </div>
+      )}
     </div>
   );
 } 

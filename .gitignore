@@ -45,3 +45,6 @@ next-env.d.ts
 #Database
 supabase-data-inserts.sql
 supabase-schema-complete.sql
+RLS_AUTHENTICATION_FIX.md
+CATEGORY_CREATION_IMPLEMENTATION.md
+SUPABASE_STORAGE_SETUP.md

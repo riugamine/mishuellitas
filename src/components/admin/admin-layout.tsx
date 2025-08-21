@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +12,21 @@ import { faSignOutAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { LogoutConfirmationDialog } from "./logout-confirmation-dialog";
+
+// Create a client instance outside of the component to avoid recreation on re-renders
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes [[memory:6541973]]
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -98,65 +115,72 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main className="flex-1 flex flex-col overflow-hidden bg-muted/30">
-        {/* Header */}
-        <div className="bg-card border-b border-border px-6 py-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <SidebarTrigger className="hover:bg-accent hover:text-accent-foreground rounded-md p-2 transition-colors" />
-              <Separator orientation="vertical" className="h-6 bg-border" />
-              <div className="flex-1 lg:flex-none">
-                <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
-              </div>
-            </div>
-            
-            {/* Header Actions */}
-            <div className="flex items-center space-x-3">
-              {/* User Info */}
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 text-sm">
-                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                    <FontAwesomeIcon icon={faUser} className="text-primary-foreground text-xs" />
-                  </div>
-                  <div className="hidden sm:block">
-                    <p className="text-foreground font-medium">{user?.email}</p>
-                    <p className="text-muted-foreground text-xs capitalize">{user?.role}</p>
-                  </div>
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="flex-1 flex flex-col overflow-hidden bg-muted/30">
+          {/* Header */}
+          <div className="bg-card border-b border-border px-6 py-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <SidebarTrigger className="hover:bg-accent hover:text-accent-foreground rounded-md p-2 transition-colors" />
+                <Separator orientation="vertical" className="h-6 bg-border" />
+                <div className="flex-1 lg:flex-none">
+                  <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
                 </div>
-                
-                <Separator orientation="vertical" className="h-8 bg-border" />
-                
-                {/* Logout Button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={showLogoutConfirmation}
-                  disabled={isLoading}
-                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                >
-                  <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4 mr-2" />
-                  <span className="hidden sm:inline">Cerrar Sesión</span>
-                </Button>
+              </div>
+              
+              {/* Header Actions */}
+              <div className="flex items-center space-x-3">
+                {/* User Info */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 text-sm">
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <FontAwesomeIcon icon={faUser} className="text-primary-foreground text-xs" />
+                    </div>
+                    <div className="hidden sm:block">
+                      <p className="text-foreground font-medium">{user?.email}</p>
+                      <p className="text-muted-foreground text-xs capitalize">{user?.role}</p>
+                    </div>
+                  </div>
+                  
+                  <Separator orientation="vertical" className="h-8 bg-border" />
+                  
+                  {/* Logout Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={showLogoutConfirmation}
+                    disabled={isLoading}
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4 mr-2" />
+                    <span className="hidden sm:inline">Cerrar Sesión</span>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-background">
-          {children}
-        </div>
-      </main>
+          
+          {/* Main Content Area */}
+          <div className="flex-1 overflow-y-auto p-6 lg:p-8 bg-background">
+            {children}
+          </div>
+        </main>
 
-      {/* Logout Confirmation Dialog */}
-      <LogoutConfirmationDialog
-        open={showLogoutDialog}
-        onOpenChange={setShowLogoutDialog}
-        onConfirm={handleLogout}
-        isLoading={isLoading}
-      />
-    </SidebarProvider>
+        {/* Logout Confirmation Dialog */}
+        <LogoutConfirmationDialog
+          open={showLogoutDialog}
+          onOpenChange={setShowLogoutDialog}
+          onConfirm={handleLogout}
+          isLoading={isLoading}
+        />
+      </SidebarProvider>
+      
+      {/* React Query DevTools (only in development) */}
+      {process.env.NODE_ENV === 'development' && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
+    </QueryClientProvider>
   );
 } 
